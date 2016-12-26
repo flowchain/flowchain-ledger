@@ -1,8 +1,15 @@
 // Import Websocket server
 var server = require('./server');
+var levelup = require('levelup');
+
+// Create our database, supply location and options
+var db = levelup('./mydb')
+
+// Utils
+var crypto = require('crypto');
 
 // Application event callbacks
-var onmessage = function(payload) {
+var onmessage = function(payload, block) {
     var data = JSON.parse(payload.data);
     var message = data.message;
     var from = data.from;
@@ -12,7 +19,29 @@ var onmessage = function(payload) {
     // Data
     var tx = message.data;
 
-    console.log('onmessage:', message);
+    // Get a block
+    if (!block) {
+        console.log('[Blockchain] no usable block now, data is ignored.');
+        return;
+    }
+
+    // Block hash as the secret and data key as the context
+    var hash = crypto.createHmac('sha256', block.hash)
+                        .update( key )
+                        .digest('hex');
+
+    db.put(hash, tx, function (err) {
+        if (err)
+            return console.log('Ooops! onmessage =', err) // some kind of I/O error
+
+        // fetch by key
+        db.get(hash, function (err, value) {
+            if (err)
+                return console.log('Ooops! onmessage =', err) // likely the key was not found
+
+            console.log('[Blockchain]', value, 'is in Block#' + block.no);
+        });
+    });
 };
 
 // Application event callbacks
@@ -22,7 +51,7 @@ var onstart = function(req, res) {
     var address = req.node.address;
     var port = req.node.port;
 
-    setTimeout(function() {
+    setInterval(function() {
         res.save('hello');
     }, 5000);
 };

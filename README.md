@@ -39,9 +39,10 @@ server.start({
 
 ## History
 
-current:
+v0.2: 2016.12.26
  * New feature: Save K to successor(K)
  * New feature: event aggregation
+ * Support block store based on LevelDB
 
 v0.1: 2016.12.23
  * Ontology: blockchain, IoT, WoT, p2p and IoT hub/gateway.

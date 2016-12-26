@@ -68,6 +68,12 @@ var serialize = JSON.stringify;
 var deserialize = JSON.parse;
 
 
+/*
+ * Blockchain system
+ */
+var Miner = require('../block/mining');      // Import flowchain miner
+var block = require('../block/genesis');     // Import flowchain genesis block
+
 /**
  * WebSocket URL Router
  */
@@ -107,6 +113,11 @@ function Server() {
   // The Node instances
   this.node = this.nodes[id] = node;
   this.last_node = id;
+
+  // Create a new miner
+  this.miner = new Miner();
+  // Blocks
+  this.blockchain = [];
 };
 
 /**
@@ -138,7 +149,7 @@ Server.prototype.onData = function(payload) {
   // The message is for me
   if (typeof this._options.onmessage === 'function' &&
     packet.message.type === Chord.MESSAGE) {
-    this._options.onmessage(payload);
+    this._options.onmessage(payload, this.blockchain[this.blockchain.length - 1]);
   }
 
   // Get node instance by ID and dispatch the message
@@ -165,6 +176,7 @@ Server.prototype.onNewThing = function(thing) {
  * @api public
  */
 Server.prototype.start = function(options) {
+  var self = this;
   var options = options || {};
 
   for (var prop in options) {
@@ -194,17 +206,12 @@ Server.prototype.start = function(options) {
 
   server.start(router.route, wsHandlers);
 
-  // Start mining blocks
-  var Miner = require('../block/mining');      // Import flowchain miner
-  var block = require('../block/genesis');     // Import flowchain genesis block
-
-  // Create a new miner
-  var miner = new Miner();
-
   console.log('----- Genesis Block -----');
   console.log( JSON.stringify(block) );
 
   console.log('----- Start mining -----');
+  var miner = this.miner;
+
   miner.setTransactions([this.node]);
   miner.setPreviousBlock(block);
 
@@ -214,13 +221,15 @@ Server.prototype.start = function(options) {
 
       // A success hash is generated
       if (miner.isSuccess()) {
-          block = miner.getNewBlock();
+          var block = miner.getNewBlock();
+
+          self.blockchain.push(block);
           miner.setPreviousBlock(block);
 
           console.log('Difficulty: ' + block.difficulty)
           console.log('Block #' + block.no + ': ' + block.hash);
       }
-  }, 500);
+  }, 50);
 
   // Event callbacks
   if (typeof this._options.onstart === 'function') {
