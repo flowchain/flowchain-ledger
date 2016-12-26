@@ -4,13 +4,18 @@ var Server = require('./server');              // Import web of things framework
 var server = new Server();
 
 var onmessage = function(payload) {
+    // Store *payload* to block
 };
 
-var onstart = function(node) {
+var onstart = function(req, res) {
     // Chord node ID
-    var id = node.id;
-    var address = node.address;
-    var port = node.port;
+    var id = req.node.id;
+    var address = req.node.address;
+    var port = req.node.port;
+
+    setTimeout(function() {
+        res.save('hello');
+    }, 5000);
 };
 
 server.start({

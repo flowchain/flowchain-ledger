@@ -192,6 +192,25 @@ Node.prototype.send = function(from, message, to) {
 };
 
 /*
+ * Save data to successor(key)
+ */
+Node.prototype.save = function(data) {
+    var to = this.successor;
+    var from = this._self;
+    var key = ChordUtils.hash(data);
+
+    var message = {
+        id: key,
+        type: Chord.FIND_SUCCESSOR,
+        data: data
+    };
+
+    this.send(to, message);
+
+    return true;
+};
+
+/*
  * @return {boolean}
  */
 Node.prototype.join = function(remote) {
@@ -308,6 +327,7 @@ Node.prototype.dispatch = function(_from, _message) {
             break; 
 
         case Chord.FOUND_SUCCESSOR:
+            // fix finger table
             if (message.hasOwnProperty('next')) {
                 this.fingers[message.next] = {
                     successor: from,
@@ -316,6 +336,16 @@ Node.prototype.dispatch = function(_from, _message) {
 
                 if (ChordUtils.DebugSuccessor)
                     console.info('FOUND_SUCCESSOR = finger table fixed');
+
+            // find successor(key)
+            } else if (message.hasOwnProperty('data')) {
+                if (ChordUtils.DebugSuccessor)
+                    console.info('found successor(key) = ' + message.id);                
+
+                message.type = Chord.MESSAGE;
+                this.send(this, message, from);
+
+            // find successor(n)
             } else {
                 this.successor = from;
 
@@ -330,7 +360,7 @@ Node.prototype.dispatch = function(_from, _message) {
                 console.info('Node joined: ' + JSON.stringify(from));
 
         case Chord.FIND_SUCCESSOR:
-            if (ChordUtils.DebugNodeJoin)
+            if (ChordUtils.DebugNodeJoin || ChordUtils.DebugSuccessor)
                 console.log('FIND_SUCCESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id, ', message.id =', message.id);
 
             // Yes, that should be a closing square bracket to match the opening parenthesis.
@@ -342,8 +372,8 @@ Node.prototype.dispatch = function(_from, _message) {
                 message.type = Chord.FOUND_SUCCESSOR;
                 this.send(this.successor, message, from);
 
-            // Fix finger table
-            } else if (message.hasOwnProperty('next')) {
+            // Fix finger table or find successor(key)
+            } else if (message.hasOwnProperty('next') || message.hasOwnProperty('data')) {
                 var n0 = this.closet_finger_preceding(message.id);
 
                 if (ChordUtils.DebugSuccessor)
@@ -374,9 +404,13 @@ Node.prototype.dispatch = function(_from, _message) {
 
             break;
 
+        // find successor(key)
         case Chord.MESSAGE:
-            this.send(this.successor, message, from);
+            if (ChordUtils.DebugMessage)
+                console.log('Message from', from,' =', message);
+
             break;
+
         default:
             console.error('Unknown Chord message: ' + message.type);
             break;

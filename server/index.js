@@ -198,12 +198,30 @@ Server.prototype.start = function(options) {
           console.log('Difficulty: ' + block.difficulty)
           console.log('Block #' + block.no + ': ' + block.hash);
       }
-  }, 50);
+  }, 500);
 
   // Event callbacks
   if (typeof this._options.onstart === 'function') {
-    this._options.onstart(this.node);
+    var req = {
+      node: {}
+    };
+    var res = {
+      save: function() {}
+    };
+
+    req.node = this.node;
+    res.save = this.save.bind(this);
+
+    this._options.onstart(req, res);
   }
+};
+
+/*
+ * @param {Object} { address: '127.0.0.1', port: 8000 }
+ * @param {Object} { type: 2, id: 'b283326930a8b2baded20bb1cf5b6358' }
+ */
+Server.prototype.save = function(data) {
+  return this.node.save(data);
 };
 
 /**
