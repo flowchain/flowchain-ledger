@@ -39,6 +39,9 @@ server.start({
 
 ## History
 
+current:
+ * New feature: Save K to successor(K)
+
 v0.1: 2016.12.23
  * Ontology: blockchain, IoT, WoT, p2p and IoT hub/gateway.
 
