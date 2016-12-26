@@ -41,6 +41,7 @@ server.start({
 
 current;
  * New difficulty algorithm based on normal distribution
+ * Support [IoT broker architecture](https://wotcity.com)
 
 v0.2: 2016.12.26
  * New feature: Save K to successor(K)

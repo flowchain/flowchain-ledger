@@ -78,7 +78,9 @@ var block = require('../block/genesis');     // Import flowchain genesis block
  * WebSocket URL Router
  */
 var wsHandlers = {
-   "/node/([A-Za-z0-9-]+)/receive": WebsocketRequestHandlers.receive
+   "/node/([A-Za-z0-9-]+)/receive": WebsocketRequestHandlers.receive,
+   "/node/([A-Za-z0-9-]+)/viewer": WebsocketRequestHandlers.viewer,
+   "/node/([A-Za-z0-9-]+)/status": WebsocketRequestHandlers.status
 };
 
 /*
@@ -89,6 +91,7 @@ var wsHandlers = {
 function Server() {
   this.port = process.env.PORT || 8000;
   this.host = process.env.HOST || 'localhost';
+  this.endpoint = process.env.ENDPOINT || '';
 
   // initialize the public attributes
   this.nodes = {};

@@ -59,7 +59,7 @@ function WebsocketBroker(options) {
   this.clientsPath = [];
   this.host = options.host || 'localhost';
   this.port = options.port || 8000;
-  this.endpoint = options.endpoint || 'wot.city';
+  this.endpoint = options.endpoint || '';
 }
 
 util.inherits(WebsocketBroker, EventEmitter);
@@ -77,6 +77,44 @@ WebsocketBroker.prototype.onRequest = function(request, response) {
 };
 
 /**
+ * Initialize a new `WebsocketBroker` with the given `options`.
+ *
+ * @param {String} path
+ * @param {Object} data
+ * @api private
+ */
+
+WebsocketBroker.prototype.dispatchData = function(path, data) {
+  var connections = this.clientsPath[path];
+
+  if (typeof(connections) === 'undefined')
+    return;
+
+  for (var i = 0; i < connections.length; i++) {
+    connections[i].sendUTF(data);
+  }
+};
+
+/**
+ * Initialize a new `WebsocketBroker` with the given `options`.
+ *
+ * @param {Object} request
+ * @param {Object} response
+ * @api private
+ */
+
+WebsocketBroker.prototype.dispatchStatus = function(path, data) {
+  var connections = this.clientsPath[path];
+
+  if (typeof connections === 'undefined')
+    return;
+
+  for (var i = 0; i < connections.length; i++) {
+    connections[i].sendUTF(data);
+  }
+};
+
+/**
  * Start websocket server.
  *
  * @param {Object} route
@@ -86,10 +124,15 @@ WebsocketBroker.prototype.onRequest = function(request, response) {
 WebsocketBroker.prototype.start = function(route, handlers) {
   var self = this;
 
-  // arguments to child processes
+  // Use options or environment variables
   var port = self.port || process.env['PORT'];
   var host = self.host || process.env['HOST'];
   var endpoint = self.endpoint || process.env['ENDPOINT'];
+
+  // Update attributes
+  this.port = port;
+  this.host = host;
+  this.endpoint = endpoint;
 
   var server = http.createServer(this.onRequest).listen(port, host, function() {
       console.info('node is running at ws://' + self.host + ':' + self.port);
@@ -106,8 +149,10 @@ WebsocketBroker.prototype.start = function(route, handlers) {
   var onWsRequest = function(request) {
     var connection = request.accept('', request.origin);
 
+    // bind information
+    connection.server = self;
+
     route(request.resource, connection, handlers, self.clientsPath);
-    //console.info('requested node URI ' + request.resource);
 
     // register this thing
     self.emit('newThing', {
@@ -116,6 +161,9 @@ WebsocketBroker.prototype.start = function(route, handlers) {
 
     connection.on('message', onWsConnMessage);
     connection.on('close', onWsConnClose);
+
+    if (typeof (connection.statusViewer) !== 'undefined')
+      self.dispatchStatus(connection.statusViewer, JSON.stringify({ isAlive: true }));
   };
 
   var onWsConnMessage = function(message) {
@@ -124,12 +172,21 @@ WebsocketBroker.prototype.start = function(route, handlers) {
       data: message.utf8Data,
       pathname: this.pathname
     });
+
+    // Is it a sender ? Yes, then push data to all viewers.
+    if (typeof (this.viewer) !== 'undefined')
+      self.dispatchData(this.viewer, message.utf8Data);
+
+    if (typeof (this.statusViewer) !== 'undefined')
+      self.dispatchStatus(this.statusViewer, JSON.stringify({ isAlive: true }));
   };
 
   var onWsConnect = function(webSocketConnection) {
   };
 
   var onWsConnClose = function(reasonCode, description) {
+    if (typeof (this.statusViewer) !== 'undefined')
+        self.dispatchStatus(this.statusViewer, JSON.stringify({ isAlive: false }));
   };
 
   wsServer.on('request', onWsRequest);
