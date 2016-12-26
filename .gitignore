@@ -39,4 +39,4 @@ src/*.js
 src/Components/*.js
 
 # LevelDB
-mydb
+mydb*

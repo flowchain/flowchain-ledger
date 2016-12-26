@@ -32,14 +32,14 @@ function Block(block) {
 	if (typeof block === 'undefined') {
 		block = {};
 	}
-	
+
 	this.hash = block.hash || '';
 	this.previousHash = block.previousHash || '';
 	this.timestamp = block.timestamp || new Date();
 	this.merkleRoot = block.merkleRoot || '0000000000000000000000000000000000000000000000000000000000000000';
     this.difficulty = block.difficulty || '00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
     this.nonce = block.nonce || 0;
-    this.no = block.no || 0;
+    this.no = block.no < 0 ? 0 : block.no;
 }
 
 module.exports = Block;

@@ -228,6 +228,9 @@ Server.prototype.start = function(options) {
 
           console.log('Difficulty: ' + block.difficulty)
           console.log('Block #' + block.no + ': ' + block.hash);
+      } else {
+          var block = miner.getMiningBlock();
+          //console.log('current difficulty = ' + block.difficulty)
       }
   }, 50);
 
@@ -245,10 +248,6 @@ Server.prototype.start = function(options) {
 
     this._options.onstart(req, res);
   }
-};
-
-Server.prototype.eventAggre = function(data) {
-  return this.node.save(data);
 };
 
 /*

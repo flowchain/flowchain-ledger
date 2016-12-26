@@ -31,7 +31,13 @@
 var crypto = require('crypto');
 var merkle = require('merkle');
 var merkleRoot = merkle('sha256');
+var os = require('os');
+
 var Block = require('./block');
+var Difficulty = require('./difficulty');
+
+// Seconds
+var MAX_UPTIME = 6000;
 
 function Miner() {
     // Transactions to be mined.
@@ -51,6 +57,10 @@ function Miner() {
 
     // Merkle tree
     this._tree = [];
+
+    // Jiffy and uptime
+    this.jiffies = 0;
+    this.startUptime = os.uptime();
 }
 
 Miner.prototype.setTransactions = function(txs) {
@@ -66,7 +76,6 @@ Miner.prototype.setPreviousBlock = function(block) {
     this.newBlock.previousHash = this.previousBlock.hash;
     this.newBlock.nonce = this.previousBlock.nonce + 1;
     this.newBlock.difficulty = this.previousBlock.difficulty;
-    this.newBlock.no = this.previousBlock.no + 1;
 };
 
 Miner.prototype.generateHash = function() {
@@ -85,8 +94,10 @@ Miner.prototype.generateHash = function() {
     this.newBlock.hash = crypto.createHmac('sha256', hash)
                         .update('powered by flowchain')
                         .digest('hex');
-    
-    //console.log(this.newBlock.nonce + '> ' + this.newBlock.hash);
+
+    // Fix difficulty
+    this.jiffies = os.uptime() - this.startUptime;
+    this._fixDifficulty();
 
     this.newBlock.nonce++;
     this._success = ( this.newBlock.hash < this.newBlock.difficulty );
@@ -99,28 +110,48 @@ Miner.prototype.isSuccess = function() {
     return this._success;
 };
 
+/*
+ * Get the newest block mined (current block)
+ */
 Miner.prototype.getNewBlock = function() {
     if (this._success === true) {
-        this._fixDifficulty();
+        this.newBlock.no = this.previousBlock.no + 1;
         return this.newBlock;
     }
+
     return null;
 };
 
+/*
+ * Get the block in mining
+ */
+Miner.prototype.getMiningBlock = function() {
+    return this.newBlock;
+};
+
+/*
+ * Get the nonce of current block
+ */
 Miner.prototype.getNonce = function() {
     return this.newBlock.nonce;
 };
 
 
-/**
- * The new difficulty
- */
-Miner.prototype._fixDifficulty = function() {
+// The simplest difficulty
+Miner.prototype._fixDifficultyNormal = function() {
     var key = this.previousBlock.difficulty;
     var index = key.length;
 
     key = '0' + key.slice(0, index - 1);
     this.newBlock.difficulty = key;
+};
+
+// Sifficulty by normal distribution (system uptime)
+Miner.prototype._fixDifficulty = function() {
+    var x = this.jiffies / MAX_UPTIME;
+
+    var difficulty = new Difficulty(x);
+    this.newBlock.difficulty = difficulty.getDifficulty();
 };
 
 module.exports = Miner;
