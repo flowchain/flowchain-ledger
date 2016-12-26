@@ -41,6 +41,7 @@ server.start({
 
 current:
  * New feature: Save K to successor(K)
+ * New feature: event aggregation
 
 v0.1: 2016.12.23
  * Ontology: blockchain, IoT, WoT, p2p and IoT hub/gateway.

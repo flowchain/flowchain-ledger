@@ -1,12 +1,21 @@
-var Server = require('./server');              // Import web of things framework
+// Import Websocket server
+var server = require('./server');
 
-// Create a node instance and connect to a subsequent Chord node
-var server = new Server();
-
+// Application event callbacks
 var onmessage = function(payload) {
-    // Store *payload* to block
+    var data = JSON.parse(payload.data);
+    var message = data.message;
+    var from = data.from;
+
+    // Key of the data
+    var key = message.id;
+    // Data
+    var tx = message.data;
+
+    console.log('onmessage:', message);
 };
 
+// Application event callbacks
 var onstart = function(req, res) {
     // Chord node ID
     var id = req.node.id;
@@ -18,6 +27,7 @@ var onstart = function(req, res) {
     }, 5000);
 };
 
+// Start the server
 server.start({
     onstart: onstart,
 	onmessage: onmessage,

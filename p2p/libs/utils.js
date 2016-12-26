@@ -3,7 +3,7 @@
  * The MIT License (MIT)
  *
  * https://www.flowchain.co
- * 
+ *
  * Copyright (c) 2016-present Jollen
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -12,10 +12,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@ var Utils = {
 	DebugSuccessor: false,
 	DebugPredecessor: false,
 	DebugStabilize: false,
-	DebugMessage: true,
+	DebugMessage: false,
 
 	DebugPrintFingerTable: true,
 
@@ -103,11 +103,11 @@ var Utils = {
 	 * @param {String} right
 	 * @return {Boolean}
 	 * @api private
-	 */	
+	 */
 	isInRange: function(key, left, right) {
 		if (Utils.DebugFixFingers || Utils.DebugStabilize)
 			console.info(key + ' isInRange [ ' + left + ', ' + right + ']')
-		
+
 		if (left < right) {
 			return (key > left && key < right) || (left === right && key !== left);
 		} else {
@@ -141,9 +141,9 @@ var Utils = {
 	            carry = d - (d % 16);
 	            carry = carry / 16;
 
-	            d = d % 16;       
+	            d = d % 16;
 	        }
-	        result[index] = d.toString(16);        
+	        result[index] = d.toString(16);
 	        --index;
 	    }
 	    return result.join('');

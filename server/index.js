@@ -3,7 +3,7 @@
  * The MIT License (MIT)
  *
  * https://www.flowchain.co
- * 
+ *
  * Copyright (c) 2016-present Jollen
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -12,10 +12,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,10 +28,17 @@
 
 'use strict';
 
+var Debug = require('./debug');
+
 /**
  * Chord Node Class
  */
 var Node = require('../p2p');
+
+/*
+ * Chord protocols
+ */
+var Chord = require('../p2p/libs/message');
 
 /**
  * Chord Utils
@@ -41,9 +48,10 @@ var ChordUtils = require('../p2p/libs/utils');
 /**
  * Web of Things Framework
  */
-var WebsocketBroker = require("../wot/broker")
-  , WebsocketRouter = require("../wot/router")
-  , WebsocketRequestHandlers = require("../wot/requestHandlers");
+var Framework = require('../wot/framework')
+  , WebsocketBroker = require('../wot/broker')
+  , WebsocketRouter = require('../wot/router')
+  , WebsocketRequestHandlers = require('../wot/requestHandlers');
 
 /**
  * Util Modules
@@ -84,7 +92,7 @@ function Server() {
 
   /*
    * Create a unique ID for the new node.
-   * 
+   *
    *  1. The ID of the node can be hashed by IP address.
    *  2. Hased by URI at this project.
    */
@@ -111,13 +119,7 @@ Server.prototype.onData = function(payload) {
   // Request URI
   var pathname = payload.pathname;
 
-  // The message is for me
-  if (typeof this._options.onmessage === 'function' &&
-    packet.message.type === Node.MESSAGE) {
-    return this._options.onmessage(payload);
-  }
-
-  /* 
+  /*
    * Format of 'packet'.
    *
    *  { message: { type: 0, id: '77c44c4f7bd4044129babdf235d943ff25a1d5f0' },
@@ -133,10 +135,27 @@ Server.prototype.onData = function(payload) {
     to = this.nodes[packet.to];
   }
 
-  // Get node instance by ID
+  // The message is for me
+  if (typeof this._options.onmessage === 'function' &&
+    packet.message.type === Chord.MESSAGE) {
+    this._options.onmessage(payload);
+  }
+
+  // Get node instance by ID and dispatch the message
   if (to) {
     to.dispatch(packet.from, packet.message);
   }
+};
+
+/**
+ * Web of things framework event handlers
+ */
+Server.prototype.onNewThing = function(thing) {
+  if (Debug.Verbose)
+    console.info('onNewThing:', thing);
+
+  // Invoke framework API to register new thing
+  this.registerThing(thing);
 };
 
 /**
@@ -149,7 +168,7 @@ Server.prototype.start = function(options) {
   var options = options || {};
 
   for (var prop in options) {
-    if (options.hasOwnProperty(prop) 
+    if (options.hasOwnProperty(prop)
         && typeof(this._options[prop]) === 'undefined')
       this._options[prop] = options[prop];
   }
@@ -162,10 +181,13 @@ Server.prototype.start = function(options) {
 
   var router = new WebsocketRouter();
 
-  // Start the protocol layer.
-  server.on('data', this.onData.bind(this));  
+  // Websocket server events (the protocol layer)
+  server.on('data', this.onData.bind(this));
 
-  // Join existing node
+  // Web of things framework event aggregation (the things layer)
+  server.on('newThing', this.onNewThing.bind(this));
+
+  // Connect to a subsequent Chord node
   if (typeof options.join === 'object') {
     this.node.join(options.join);
   }
@@ -214,6 +236,10 @@ Server.prototype.start = function(options) {
 
     this._options.onstart(req, res);
   }
+};
+
+Server.prototype.eventAggre = function(data) {
+  return this.node.save(data);
 };
 
 /*
@@ -271,6 +297,23 @@ Server.prototype.sendChordMessage = function(to, packet) {
 };
 
 /**
+ * Create a web of things server.
+ *
+ * @return {Object}
+ * @api public
+ */
+function createServer() {
+    var _server = new Server();
+
+    // Combined Websocket server with web of things framework
+    var server = new Framework({
+        server: _server
+    });
+
+    return server;
+}
+
+/**
  * Export the server.
  */
-module.exports = Server;
+module.exports = createServer();
