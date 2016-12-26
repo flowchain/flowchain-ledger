@@ -170,9 +170,10 @@ Server.prototype.onNewThing = function(thing) {
 };
 
 /**
- * Start a Websocket server.
+ * Start a Websocket server
  *
- * @return {None}
+ * @param options {Object} - Configuration file
+ * @returns {None}
  * @api public
  */
 Server.prototype.start = function(options) {
@@ -261,9 +262,9 @@ Server.prototype.save = function(data) {
 /**
  * Send Chord message.
  *
- * @param {Object} { address: '127.0.0.1', port: 8000 }
- * @param {Object} { type: 2, id: 'b283326930a8b2baded20bb1cf5b6358' }
- * @return {None}
+ * @param to {Object} - { address: '127.0.0.1', port: 8000 }
+ * @param packet {Object} - { type: 2, id: 'b283326930a8b2baded20bb1cf5b6358' }
+ * @returns {None}
  * @api public
  */
 var connections = [];
@@ -305,9 +306,9 @@ Server.prototype.sendChordMessage = function(to, packet) {
 };
 
 /**
- * Create a web of things server.
+ * Create a web of things server
  *
- * @return {Object}
+ * @returns {Object}
  * @api public
  */
 function createServer() {

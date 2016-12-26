@@ -39,6 +39,9 @@ server.start({
 
 ## History
 
+current;
+ * New difficulty algorithm based on normal distribution
+
 v0.2: 2016.12.26
  * New feature: Save K to successor(K)
  * New feature: event aggregation
