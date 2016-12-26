@@ -196,6 +196,27 @@ Node.prototype.save = function(data) {
 };
 
 /*
+ * Read data of key from successor(key)
+ */
+Node.prototype.read = function(key) {
+    var to = this.successor;
+    var from = this._self;
+
+    var message = {
+        id: key,
+        type: Chord.FIND_SUCCESSOR,
+        data: {
+            origin: from,
+            key: key
+        }
+    };
+
+    this.send(to, message);
+
+    return true;
+};
+
+/*
  * @return {boolean}
  */
 Node.prototype.join = function(remote) {
@@ -357,7 +378,7 @@ Node.prototype.dispatch = function(_from, _message) {
                 message.type = Chord.FOUND_SUCCESSOR;
                 this.send(this.successor, message, from);
 
-            // Fix finger table or find successor(key)
+            // Fix finger table,  find successor(key) or read(key)
             } else if (message.hasOwnProperty('next') || message.hasOwnProperty('data')) {
                 var n0 = this.closet_finger_preceding(message.id);
 

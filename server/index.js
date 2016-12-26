@@ -149,10 +149,23 @@ Server.prototype.onData = function(payload) {
     to = this.nodes[packet.to];
   }
 
+  var tx = {};
+
+  if (typeof packet.message.data !== 'undefined') {
+    tx = packet.message.data;
+  }
+
+  // This message is for me to query data of my blocks
+  if (typeof this._options.onquery === 'function'
+        && typeof tx !== 'undefined'
+        && typeof tx.origin !== 'undefined'
+        && packet.message.type === Chord.MESSAGE) {
+    return this._options.onquery(tx.key, this.blockchain[this.blockchain.length - 1]);
+
   // The message is for me
-  if (typeof this._options.onmessage === 'function' &&
-    packet.message.type === Chord.MESSAGE) {
-    this._options.onmessage(payload, this.blockchain[this.blockchain.length - 1]);
+  } else if (typeof this._options.onmessage === 'function'
+        && packet.message.type === Chord.MESSAGE) {
+    return this._options.onmessage(payload, this.blockchain[this.blockchain.length - 1]);
   }
 
   // Get node instance by ID and dispatch the message
@@ -227,7 +240,9 @@ Server.prototype.start = function(options) {
       if (miner.isSuccess()) {
           var block = miner.getNewBlock();
 
+          // Successful mined and save the new block
           self.blockchain.push(block);
+
           miner.setPreviousBlock(block);
 
           console.log('Difficulty: ' + block.difficulty)
@@ -244,22 +259,35 @@ Server.prototype.start = function(options) {
       node: {}
     };
     var res = {
-      save: function() {}
+      save: function() {},
+      read: function() {}
     };
 
     req.node = this.node;
     res.save = this.save.bind(this);
+    res.read = this.read.bind(this);
 
     this._options.onstart(req, res);
   }
 };
 
 /*
+ * CRUD of data query
+ *
  * @param {Object} { address: '127.0.0.1', port: 8000 }
  * @param {Object} { type: 2, id: 'b283326930a8b2baded20bb1cf5b6358' }
  */
 Server.prototype.save = function(data) {
   return this.node.save(data);
+};
+
+/*
+ * CRUD of data query
+ *
+ * @param key {String} -
+ */
+Server.prototype.read = function(key) {
+  return this.node.read(key);
 };
 
 /**

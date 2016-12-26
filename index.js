@@ -39,7 +39,7 @@ var onmessage = function(payload, block) {
             if (err)
                 return console.log('Ooops! onmessage =', err) // likely the key was not found
 
-            console.log('[Blockchain]', value, 'is in Block#' + block.no);
+            console.log('[Blockchain]', value, 'is in Block#' + block.no, ', its data key =', key);
         });
     });
 };
@@ -56,8 +56,24 @@ var onstart = function(req, res) {
     }, 5000);
 };
 
+// Application event callbacks
+var onquery = function(key, block) {
+    if (!block) return;
+
+    // Block hash as the secret and data key as the context
+    var hash = crypto.createHmac('sha256', block.hash)
+                        .update( key )
+                        .digest('hex');
+
+    // fetch by key
+    db.get(hash, function (err, value) {
+        console.log('[Blockchain] read(' + hash + ') =', value)
+    });
+};
+
 // Start the server
 server.start({
     onstart: onstart,
 	onmessage: onmessage,
+    onquery: onquery
 });
