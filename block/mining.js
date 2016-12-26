@@ -34,10 +34,6 @@ var merkleRoot = merkle('sha256');
 var os = require('os');
 
 var Block = require('./block');
-var Difficulty = require('./difficulty');
-
-// Seconds
-var MAX_UPTIME = 6000;
 
 function Miner() {
     // Transactions to be mined.
@@ -97,7 +93,7 @@ Miner.prototype.generateHash = function() {
 
     // Fix difficulty
     this.jiffies = os.uptime() - this.startUptime;
-    this._fixDifficulty();
+    this._fixDifficultyNormal();
 
     this.newBlock.nonce++;
     this._success = ( this.newBlock.hash < this.newBlock.difficulty );
@@ -111,12 +107,12 @@ Miner.prototype.isSuccess = function() {
 };
 
 /*
- * Get the newest block mined (current block)
+ * Copy states and return the current block
  */
 Miner.prototype.getNewBlock = function() {
     if (this._success === true) {
         this.newBlock.no = this.previousBlock.no + 1;
-        return this.newBlock;
+        return new Block(this.newBlock);
     }
 
     return null;
@@ -148,6 +144,10 @@ Miner.prototype._fixDifficultyNormal = function() {
 
 // Sifficulty by normal distribution (system uptime)
 Miner.prototype._fixDifficulty = function() {
+    var Difficulty = require('./difficulty');
+
+    // Seconds
+    var MAX_UPTIME = 6000;
     var x = this.jiffies / MAX_UPTIME;
 
     var difficulty = new Difficulty(x);
