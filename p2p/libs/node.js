@@ -138,9 +138,10 @@ Node.prototype._startUpdateFingers = function() {
             this.predecessor_ttl = this.ttl;
         }
 
-        // notify successor for its predecessor
-        if (this.id !== this.successor.id)
-            this.send(this.successor, { type: Chord.NOTIFY_STABILZE });
+        // Notify successor for its predecessor
+        // Uncomment this line to "break the ring"
+        //if (this.id !== this.successor.id)
+        this.send(this.successor, { type: Chord.NOTIFY_STABILZE });
 
         // checks whether predecessor has failed
         if (this.predecessor !== null)
