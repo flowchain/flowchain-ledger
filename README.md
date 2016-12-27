@@ -39,10 +39,11 @@ server.start({
 
 ## History
 
-current:
+v0.3: 2016.12.27
  * New difficulty algorithm based on normal distribution
  * Support [IoT broker architecture](https://wotcity.com)
  * Support data query
+ * Support failure check
 
 v0.2: 2016.12.26
  * New feature: Save K to successor(K)
