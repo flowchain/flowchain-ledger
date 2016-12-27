@@ -57,7 +57,7 @@ var onstart = function(req, res) {
     setInterval(function() {
         console.log('Read key =', key);
         res.read(key);
-    }, 2500);
+    }, 6000);
 };
 
 // Application event callbacks

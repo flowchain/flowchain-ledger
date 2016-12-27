@@ -44,7 +44,7 @@ function Node(id, server) {
     // Each node can keep a finger table containing up to 'm' entries
     // Default is 32 entries
     this.finger_entries = 8;
-    this.ttl = 3;
+    this.ttl = 6;
 
     // Default successor is self
     this._self = {
@@ -133,10 +133,30 @@ Node.prototype._startUpdateFingers = function() {
 
     // Stabilize
     setInterval(function stabilize() {
+        this.send(this.successor, { type: Chord.NOTIFY_STABILZE });
+    }.bind(this), 2500);
+
+    // Failure check
+    setInterval(function check_predecessor() {
+        if (ChordUtils.DebugFailureCheck) {
+            console.log('predecessor_ttl =', this.predecessor_ttl);
+        }
+
         // check predecessor
         if (--this.predecessor_ttl < 1) {
             this.predecessor = null;
             this.predecessor_ttl = this.ttl;
+        }
+
+        // checks whether predecessor has failed
+        if (this.predecessor !== null)
+            this.send(this.predecessor, { type: Chord.CHECK_PREDECESSOR, predecessor_ttl: this.predecessor_ttl });
+    }.bind(this), 1500);
+
+    // Failure check
+    setInterval(function check_successor() {
+        if (ChordUtils.DebugFailureCheck) {
+            console.log('successor_ttl =', this.successor_ttl);
         }
 
         // check successor
@@ -145,17 +165,8 @@ Node.prototype._startUpdateFingers = function() {
             this.successor_ttl = this.ttl;
         }
 
-        // Notify successor for its predecessor
-        // Check successor
-
-        // Uncomment this line to "break the ring"
-        //if (this.id !== this.successor.id)
-        this.send(this.successor, { type: Chord.NOTIFY_STABILZE, successor_ttl: this.successor_ttl });
-
-        // checks whether predecessor has failed
-        if (this.predecessor !== null)
-            this.send(this.predecessor, { type: Chord.CHECK_PREDECESSOR, predecessor_ttl: this.predecessor_ttl });
-    }.bind(this), 3000);
+        this.send(this.successor, { type: Chord.CHECK_SUCESSOR, successor_ttl: this.successor_ttl });
+    }.bind(this), 3500);
 
     setInterval(fix_fingers.bind(this), 5000);
 }
@@ -291,13 +302,12 @@ Node.prototype.dispatch = function(_from, _message) {
                 this.predecessor = from;
             }
 
+            // unstabilized
             if (ChordUtils.isInRange(this.predecessor.id, from.id, this.id)) {
                 message.type = Chord.NOTIFY_PREDECESSOR;
                 return this.send(this.predecessor, message, from);
             }
 
-            // reset my TTL
-            message.successor_ttl = this.ttl;
             message.type = Chord.NOTIFY_SUCCESSOR;
             this.send(from, message, this);
 
@@ -323,14 +333,6 @@ Node.prototype.dispatch = function(_from, _message) {
         case Chord.NOTIFY_SUCCESSOR:
             if (ChordUtils.DebugStabilize)
                 console.log('NOTIFY_SUCCESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
-
-            if (message.hasOwnProperty('predecessor_ttl')) {
-                this.predecessor_ttl = message.predecessor_ttl;
-            }
-
-            if (message.hasOwnProperty('successor_ttl')) {
-                this.successor_ttl = message.successor_ttl;
-            }
 
             /* n.notify(n')
              *  if (predecessor is nil or n'∈(predecessor, n))
@@ -417,10 +419,30 @@ Node.prototype.dispatch = function(_from, _message) {
 
         case Chord.CHECK_PREDECESSOR:
             // reset our ttl
-            message.type = Chord.NOTIFY_SUCCESSOR;
+            message.type = Chord.CHECK_TTL;
             message.predecessor_ttl = this.ttl;
 
             this.send(this, message, from);
+
+            break;
+
+        case Chord.CHECK_SUCESSOR:
+            // reset our ttl
+            message.type = Chord.CHECK_TTL;
+            message.successor_ttl = this.ttl;
+
+            this.send(this, message, from);
+
+            break;
+
+        case Chord.CHECK_TTL:
+            if (message.hasOwnProperty('predecessor_ttl')) {
+                this.predecessor_ttl = message.predecessor_ttl;
+            }
+
+            if (message.hasOwnProperty('successor_ttl')) {
+                this.successor_ttl = message.successor_ttl;
+            }
 
             break;
 

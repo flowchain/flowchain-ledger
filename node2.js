@@ -50,14 +50,6 @@ var onstart = function(req, res) {
     var id = req.node.id;
     var address = req.node.address;
     var port = req.node.port;
-
-    // Key
-    var key = 'd23bd60f8fd738abb252df6417764f3e6fb0c538';
-
-    setInterval(function() {
-        console.log('Read key =', key);
-        res.read(key);
-    }, 2500);
 };
 
 // Application event callbacks

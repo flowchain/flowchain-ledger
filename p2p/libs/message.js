@@ -37,7 +37,9 @@ var Chord = {
     FIND_SUCCESSOR: 4,
     FOUND_SUCCESSOR: 5,
     CHECK_PREDECESSOR: 6,
-    MESSAGE: 7
+    CHECK_SUCESSOR: 7,
+    CHECK_TTL: 8,
+    MESSAGE: 9
 };
 
 if (typeof(module) != "undefined" && typeof(exports) != "undefined")

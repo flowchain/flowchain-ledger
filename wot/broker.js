@@ -59,7 +59,7 @@ function WebsocketBroker(options) {
   this.clientsPath = [];
   this.host = options.host || 'localhost';
   this.port = options.port || 8000;
-  this.endpoint = options.endpoint || '';
+  this.endpoint = options.endpoint || null;
 }
 
 util.inherits(WebsocketBroker, EventEmitter);

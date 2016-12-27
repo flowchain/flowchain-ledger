@@ -38,6 +38,7 @@ var Utils = {
 	DebugPredecessor: false,
 	DebugStabilize: false,
 	DebugMessage: false,
+    DebugFailureCheck: true,
 
 	DebugPrintFingerTable: true,
 

@@ -91,7 +91,7 @@ var wsHandlers = {
 function Server() {
   this.port = process.env.PORT || 8000;
   this.host = process.env.HOST || 'localhost';
-  this.endpoint = process.env.ENDPOINT || '';
+  this.endpoint = process.env.ENDPOINT || null;
 
   // initialize the public attributes
   this.nodes = {};
@@ -251,7 +251,7 @@ Server.prototype.start = function(options) {
           var block = miner.getMiningBlock();
           //console.log('current difficulty = ' + block.difficulty)
       }
-  }, 50);
+  }, 850);
 
   // Event callbacks
   if (typeof this._options.onstart === 'function') {
