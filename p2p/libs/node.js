@@ -44,7 +44,7 @@ function Node(id, server) {
     // Each node can keep a finger table containing up to 'm' entries
     // Default is 32 entries
     this.finger_entries = 8;
-    this.ttl = 5;
+    this.ttl = 3;
 
     // Default successor is self
     this._self = {
@@ -65,6 +65,7 @@ function Node(id, server) {
 
     // TTL of predecessor
     this.predecessor_ttl = this.ttl;
+    this.successor_ttl = this.ttl;
 
     console.info('node id = '+ this.id);
     console.info('successor = ' + JSON.stringify(this.successor));
@@ -138,14 +139,22 @@ Node.prototype._startUpdateFingers = function() {
             this.predecessor_ttl = this.ttl;
         }
 
+        // check successor
+        if (--this.successor_ttl < 1) {
+            this.successor = this._self;
+            this.successor_ttl = this.ttl;
+        }
+
         // Notify successor for its predecessor
+        // Check successor
+
         // Uncomment this line to "break the ring"
         //if (this.id !== this.successor.id)
-        this.send(this.successor, { type: Chord.NOTIFY_STABILZE });
+        this.send(this.successor, { type: Chord.NOTIFY_STABILZE, successor_ttl: this.successor_ttl });
 
         // checks whether predecessor has failed
         if (this.predecessor !== null)
-            this.send(this.predecessor, { type: Chord.CHECK_PREDECESSOR, ttl: this.predecessor_ttl });
+            this.send(this.predecessor, { type: Chord.CHECK_PREDECESSOR, predecessor_ttl: this.predecessor_ttl });
     }.bind(this), 3000);
 
     setInterval(fix_fingers.bind(this), 5000);
@@ -287,6 +296,8 @@ Node.prototype.dispatch = function(_from, _message) {
                 return this.send(this.predecessor, message, from);
             }
 
+            // reset my TTL
+            message.successor_ttl = this.ttl;
             message.type = Chord.NOTIFY_SUCCESSOR;
             this.send(from, message, this);
 
@@ -313,11 +324,13 @@ Node.prototype.dispatch = function(_from, _message) {
             if (ChordUtils.DebugStabilize)
                 console.log('NOTIFY_SUCCESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
 
-            if (message.hasOwnProperty('ttl')) {
-                this.predecessor_ttl = message.ttl;
+            if (message.hasOwnProperty('predecessor_ttl')) {
+                this.predecessor_ttl = message.predecessor_ttl;
             }
 
-            this.predecessor_ttl--;
+            if (message.hasOwnProperty('successor_ttl')) {
+                this.successor_ttl = message.successor_ttl;
+            }
 
             /* n.notify(n')
              *  if (predecessor is nil or n'∈(predecessor, n))
@@ -405,7 +418,7 @@ Node.prototype.dispatch = function(_from, _message) {
         case Chord.CHECK_PREDECESSOR:
             // reset our ttl
             message.type = Chord.NOTIFY_SUCCESSOR;
-            message.ssl = this.ttl;
+            message.predecessor_ttl = this.ttl;
 
             this.send(this, message, from);
 
