@@ -39,6 +39,10 @@ server.start({
 
 ## History
 
+v0.5: 2016.12.28
+ * Support transaction verify
+ * Update boot node and peer node applications
+
 v0.4: 2016.12.28
  * Bug fixes. ([#62bbfb876f0cca1c4144cc55831a2a5cd42e4f6d])
  * Support leveldb and nedb
