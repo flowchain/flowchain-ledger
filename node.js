@@ -1,15 +1,19 @@
 // Import Websocket server
 var server = require('./server');
-var levelup = require('levelup');
-
-// Create our database, supply location and options
-var db = levelup('./mydb2')
 
 // Utils
 var crypto = require('crypto');
 
+// Database
+var Database = require('./database');
+var db = new Database('nedb');
+
 // Application event callbacks
-var onmessage = function(payload, block) {
+var onmessage = function(req, res) {
+    var payload = req.payload;
+    var block = req.block;
+    var node = req.node;
+
     var data = JSON.parse(payload.data);
     var message = data.message;
     var from = data.from;
@@ -30,6 +34,15 @@ var onmessage = function(payload, block) {
                         .update( key )
                         .digest('hex');
 
+    // Generate an asset
+    var asset = {
+        // Data key
+        key: key
+    };
+
+    // Give out the asset
+    //res.send(asset);
+
     db.put(hash, tx, function (err) {
         if (err)
             return console.log('Ooops! onmessage =', err) // some kind of I/O error
@@ -40,6 +53,9 @@ var onmessage = function(payload, block) {
                 return console.log('Ooops! onmessage =', err) // likely the key was not found
 
             console.log('[Blockchain]', value, 'is in Block#' + block.no, ', its data key =', key);
+            console.log('[Blockchain] verifying tx =', key);
+
+            res.read(key);
         });
     });
 };
@@ -49,37 +65,54 @@ var onstart = function(req, res) {
     // Chord node ID
     var id = req.node.id;
     var address = req.node.address;
-    var port = req.node.port;
-
-    // Key
-    var key = 'd23bd60f8fd738abb252df6417764f3e6fb0c538';
-
-    console.log('Read key =', key);
-    res.read(key);
 };
 
 // Application event callbacks
-var onquery = function(key, block) {
+var onquery = function(req, res) {
+    var tx = req.tx;
+    var block = req.block;
+
+    console.log('[Blockchain] verified tx =', tx);
+
     if (!block) return;
 
     // Block hash as the secret and data key as the context
     var hash = crypto.createHmac('sha256', block.hash)
-                        .update( key )
+                        .update( tx.key )
                         .digest('hex');
 
-    // fetch by key
     db.get(hash, function (err, value) {
-        console.log('value =', value)
+        if (err)
+            return console.log('Ooops! onmessage =', err) // likely the key was not found
+
+        var tx = value[0].tx;
+
+        tx.source = {
+            address: req.node.address,
+            port: req.node.port
+        };
+
+        console.log('[Blockchain]', tx, 'is found at Block#' + block.no);
+        res.send(tx);
     });
+};
+
+// Application event callbacks
+var ondata = function(req, res) {
+    var data = req.data;
+    var put = res.save;
+
+    put(data);
 };
 
 // Start the server
 server.start({
     onstart: onstart,
-	onmessage: onmessage,
+    onmessage: onmessage,
     onquery: onquery,
-	join: {
-		address: 'localhost',
-		port: 8000
-	}
+    ondata: ondata,
+    join: {
+        address: 'localhost',
+        port: '8000'
+    }
 });
