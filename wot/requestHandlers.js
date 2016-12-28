@@ -35,13 +35,13 @@ var webSocketConnections = [];
 
 // Handlers object
 Handlers = {
-    receive: function(pathname, connection, clients) {
+    send: function(pathname, connection, clients) {
         // the original sender pathname
         connection.pathname = pathname;
 
         /*
          * convert sender pathname to viewer pathname
-         * eg. '/node/:id/receive' to '/node/:id/viewer'
+         * eg. '/object/:id/send' to '/object/:id/viewer'
          */
         var paths = pathname.split('/');
 
@@ -139,6 +139,9 @@ Handlers = {
          */
         clients[pathname] = [];
         clients[pathname].push(connection);
+    },
+
+    receive: function(pathname, connection, clients) {
     }
 };
 

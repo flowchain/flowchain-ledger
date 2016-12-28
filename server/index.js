@@ -78,9 +78,11 @@ var block = require('../block/genesis');     // Import flowchain genesis block
  * WebSocket URL Router
  */
 var wsHandlers = {
-   "/node/([A-Za-z0-9-]+)/receive": WebsocketRequestHandlers.receive,
-   "/node/([A-Za-z0-9-]+)/viewer": WebsocketRequestHandlers.viewer,
-   "/node/([A-Za-z0-9-]+)/status": WebsocketRequestHandlers.status
+   "/object/([A-Za-z0-9-]+)/viewer": WebsocketRequestHandlers.viewer,
+   "/object/([A-Za-z0-9-]+)/status": WebsocketRequestHandlers.status,
+   "/object/([A-Za-z0-9-]+)/send": WebsocketRequestHandlers.send,
+
+   "/node/([A-Za-z0-9-]+)/receive": WebsocketRequestHandlers.receive
 };
 
 /*
@@ -132,6 +134,27 @@ Server.prototype.onData = function(payload) {
 
   // Request URI
   var pathname = payload.pathname;
+
+  if (typeof packet.message === 'undefined'
+        || typeof packet.message.type === 'undefined') {
+    // Not a chord message
+    if (typeof this._options.ondata === 'function') {
+        var req = {
+          node: {}
+        };
+        var res = {
+          save: function() {},
+          read: function() {}
+        };
+
+        req.node = this.node;
+        req.data = packet;
+        res.save = this.save.bind(this);
+        res.read = this.read.bind(this);
+
+        return this._options.ondata(req, res);
+    }
+  }
 
   /*
    * Format of 'packet'.
@@ -251,7 +274,7 @@ Server.prototype.start = function(options) {
           var block = miner.getMiningBlock();
           //console.log('current difficulty = ' + block.difficulty)
       }
-  }, 850);
+  }, 50);
 
   // Event callbacks
   if (typeof this._options.onstart === 'function') {
