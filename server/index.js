@@ -94,12 +94,16 @@ function Server() {
   this.port = process.env.PORT || 8000;
   this.host = process.env.HOST || 'localhost';
   this.endpoint = process.env.ENDPOINT || null;
+  this.thingid = process.env.THINGID || '5550937980d51931b3000009';
 
   // initialize the public attributes
   this.nodes = {};
 
   // initialize the private attributes
   this._options = {}
+
+  // Websocket connection of endpoint
+  this.endpointConnection = null;
 
   /*
    * Create a unique ID for the new node.
@@ -183,12 +187,47 @@ Server.prototype.onData = function(payload) {
         && typeof tx !== 'undefined'
         && typeof tx.origin !== 'undefined'
         && packet.message.type === Chord.MESSAGE) {
-    return this._options.onquery(tx.key, this.blockchain[this.blockchain.length - 1]);
+    var req = {
+      node: {}
+    };
+    var res = {
+      save: function() {},
+      read: function() {},
+      send: function() {}
+    };
+
+    req.node = this.node;
+    req.payload = payload;
+    req.block = this.blockchain[this.blockchain.length - 1];
+    req.tx = tx;
+
+    res.save = this.save.bind(this);
+    res.read = this.read.bind(this);
+    res.send = this.sendAsset.bind(this);
+
+    return this._options.onquery(req, res);
 
   // The message is for me
   } else if (typeof this._options.onmessage === 'function'
         && packet.message.type === Chord.MESSAGE) {
-    return this._options.onmessage(payload, this.blockchain[this.blockchain.length - 1]);
+    var req = {
+      node: {}
+    };
+    var res = {
+      save: function() {},
+      read: function() {},
+      send: function() {}
+    };
+
+    req.node = this.node;
+    req.payload = payload;
+    req.block = this.blockchain[this.blockchain.length - 1];
+
+    res.save = this.save.bind(this);
+    res.read = this.read.bind(this);
+    res.send = this.sendAsset.bind(this);
+
+    return this._options.onmessage(req, res);
   }
 
   // Get node instance by ID and dispatch the message
@@ -357,6 +396,58 @@ Server.prototype.sendChordMessage = function(to, packet) {
   });
 
   client.connect(uri, '');
+};
+
+/**
+ * Give an asset to endpoint.
+ *
+ * @param asset {Object} - Issued asset to be gave out
+ * @returns {Object}
+ * @api public
+ */
+Server.prototype.sendAsset = function(asset) {
+    // Start forward data to endpoint
+    var endpoint = this.endpoint;
+    var connection = this.endpointConnection;
+    var self = this;
+
+    if (!endpoint) return;
+
+    if (!/^(ws|wss):\/\//.test(endpoint)) {
+        endpoint = 'ws://' + endpoint;
+    }
+
+    if (connection === null) {
+        var wsClient = new WebSocketClient();
+
+        wsClient.on('connectFailed', function(error) {
+            self.endpointConnection = null;
+        });
+
+        wsClient.on('connect', function(conn) {
+            conn.on('error', function(error) {
+                self.endpointConnection = null;
+            });
+            conn.on('close', function() {
+                self.endpointConnection = null;
+            });
+            conn.on('message', function(message) {
+            });
+
+            self.endpointConnection = conn;
+        });
+
+        var uri = util.format('%s/object/%s/send', endpoint, this.thingid);
+
+        // initial websocket connection
+        return wsClient.connect(uri, '');
+    }
+
+    if (typeof asset === 'object')
+        asset = JSON.stringify(asset);
+
+    // Send data to endpont
+    connection.sendUTF(asset);
 };
 
 /**

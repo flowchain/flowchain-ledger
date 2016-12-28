@@ -60,6 +60,7 @@ function WebsocketBroker(options) {
   this.host = options.host || 'localhost';
   this.port = options.port || 8000;
   this.endpoint = options.endpoint || null;
+  this.thingid = options.thingid || '5550937980d51931b3000009';
 }
 
 util.inherits(WebsocketBroker, EventEmitter);
