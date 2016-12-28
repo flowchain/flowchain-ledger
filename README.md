@@ -39,7 +39,7 @@ server.start({
 
 ## History
 
-current: 2016.12.28
+v0.4: 2016.12.28
  * Bug fixes. ([#62bbfb876f0cca1c4144cc55831a2a5cd42e4f6d])
  * Support leveldb and nedb
  * Add new event: ```ondata```
