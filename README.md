@@ -39,6 +39,11 @@ server.start({
 
 ## History
 
+current: 2016.12.28
+ * Bug fixes. ([#62bbfb876f0cca1c4144cc55831a2a5cd42e4f6d])
+ * Support leveldb and nedb
+ * Add new event: ```ondata```
+
 v0.3: 2016.12.27
  * New difficulty algorithm based on normal distribution
  * Support [IoT broker architecture](https://wotcity.com)
@@ -52,6 +57,7 @@ v0.2: 2016.12.26
 
 v0.1: 2016.12.23
  * Ontology: blockchain, IoT, WoT, p2p and IoT hub/gateway.
+ * Architecture: REST, RPC
 
 ## License
 
