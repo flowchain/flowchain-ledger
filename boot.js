@@ -6,7 +6,7 @@ var crypto = require('crypto');
 
 // Database
 var Database = require('./database');
-var db = new Database('nedb');
+var db = new Database('picodb');
 
 // Application event callbacks
 var onmessage = function(req, res) {
@@ -49,6 +49,8 @@ var onmessage = function(req, res) {
 
         // fetch by key
         db.get(hash, function (err, value) {
+        console.log('[Database] get err =', err);
+
             if (err)
                 return console.log('Ooops! onmessage =', err) // likely the key was not found
 

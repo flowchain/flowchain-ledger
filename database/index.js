@@ -30,12 +30,6 @@
 
 // Database Adapter
 
-// leveldb: key-value pairs persistent data store
-var levelup = require('levelup');
-
-// nedb: In-memory only datastore (no need to load the database)
-var Datastore = require('nedb')
-
 function DataAdapter(name) {
     this.db = {};
     this._put = function() {};
@@ -46,6 +40,9 @@ function DataAdapter(name) {
 
 DataAdapter.prototype._use = function(name) {
     if (name === 'leveldb') {
+        // leveldb: key-value pairs persistent data store
+        var levelup = require('levelup');
+
         // Create our database, supply location and options
         this.db = levelup('./mydb');
         this._get = this._get_leveldb
@@ -55,6 +52,9 @@ DataAdapter.prototype._use = function(name) {
     }
 
     if (name === 'nedb') {
+        // nedb: In-memory only datastore (no need to load the database)
+        var Datastore = require('nedb')
+
         this.db = new Datastore();
         this._get = this._get_nedb;
         this._put = this._put_nedb;
@@ -62,10 +62,16 @@ DataAdapter.prototype._use = function(name) {
         return true;
     }
 
-    // Default
-    this.db = levelup('./mydb');
-    this._get = this._get_leveldb
-    this._put = this._put_nedb;
+    if (name === 'picodb') {
+        // nedb: In-memory only datastore (no need to load the database)
+        var PicoDB = require('picodb');
+
+        this.db = PicoDB.Create();
+        this._get = this._get_picodb;
+        this._put = this._put_picodb;
+
+        return true;
+    }
 
     return true;
 }
@@ -105,6 +111,23 @@ DataAdapter.prototype._put_nedb = function(hash, tx, cb) {
 
 DataAdapter.prototype._get_nedb = function(hash, cb) {
     this.db.find({ hash: hash }, function (err, docs) {
+        cb(err, docs);
+    });
+};
+
+DataAdapter.prototype._put_picodb = function(hash, tx, cb) {
+    var doc = {
+        hash: hash,
+        tx: tx
+    };
+
+    this.db.insertOne(doc, function (err, results) {
+      cb(err);
+    });
+};
+
+DataAdapter.prototype._get_picodb = function(hash, cb) {
+    this.db.find({ hash: hash }).toArray(function (err, docs) {
         cb(err, docs);
     });
 };

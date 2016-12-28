@@ -10,6 +10,7 @@
     "merkle": "^0.5.1",
     "nedb": "^1.8.0",
     "node-rsa": "^0.4.2",
+    "picodb": "^0.8.1",
     "underscore": "^1.8.3",
     "utils-merge": "^1.0.0",
     "uuid": "^3.0.1",

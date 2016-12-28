@@ -39,6 +39,9 @@ server.start({
 
 ## History
 
+current:
+ * Add PicoDB support
+
 v0.5: 2016.12.28
  * Support transaction verify
  * Update boot node and peer node applications
