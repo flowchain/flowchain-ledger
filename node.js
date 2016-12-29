@@ -114,7 +114,7 @@ server.start({
     onquery: onquery,
     ondata: ondata,
     join: {
-        address: 'localhost',
-        port: '8000'
+        address: process.argv[2] || 'localhost',
+        port: process.argv[3] || '8000'
     }
 });
