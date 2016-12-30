@@ -1,8 +1,10 @@
-Flowchain is a private blockchain system for the Internet of Things.
+![](https://raw.githubusercontent.com/flowchain/flowchain.github.io/master/images/logo-text%40128.png)
+
+Private ledger that supports streaming and real-time data flow.
 
 # Introduction
 
-Flowchain is a device server application for full scale hardware which is from MCU to mainstream servers.
+Flowchain is a private blockchain system for the Internet of Things, and it is a device server application for full scale hardware which is from MCU to mainstream servers.
 
 Flowchain leverages the emerging technologies of blockchain, peer-to-peer, web of things, IoT and open IoT cloud.
 
