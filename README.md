@@ -45,6 +45,7 @@ server.start({
 * flowchain: [https://github.com/flowchain/flowchain](https://github.com/flowchain/flowchain)
 * DevifyPlatform: [https://github.com/DevifyPlatform/devify-server](https://github.com/DevifyPlatform/devify-server)
 * node-p2p-chord: [https://github.com/jollen/node-p2p-chord](https://github.com/jollen/node-p2p-chord)
+* wwRPC: [https://github.com/jollen/wwRPC](https://github.com/jollen/wwRPC)
 
 ## History
 
