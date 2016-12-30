@@ -37,6 +37,13 @@ server.start({
 });
 ```
 
+## Flowchain Modules
+
+* wotcity.io: (https://github.com/wotcity/wotcity-wot-framework)[https://github.com/wotcity/wotcity-wot-framework]
+* flowchain: (https://github.com/flowchain/flowchain)[https://github.com/flowchain/flowchain]
+* DevifyPlatform: (https://github.com/DevifyPlatform/devify-server)[https://github.com/DevifyPlatform/devify-server]
+* node-p2p-chord: (https://github.com/jollen/node-p2p-chord)[https://github.com/jollen/node-p2p-chord]
+
 ## History
 
 current:
