@@ -43,6 +43,14 @@ var onmessage = function(req, res) {
     // Give out the asset
     //res.send(asset);
 
+    // Establish a linked data description
+    var device = {
+        '@context': [
+            'http://w3c.github.io/wot/w3c-wot-td-contxt.jsonld'
+        },
+        'name': '',
+    };
+
     db.put(hash, tx, function (err) {
         if (err)
             return console.log('Ooops! onmessage =', err) // some kind of I/O error
