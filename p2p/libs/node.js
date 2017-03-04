@@ -120,8 +120,8 @@ Node.prototype._startUpdateFingers = function() {
 
             // send to debug server
             this.send({
-                address: '192.168.0.101',
-                port: 8000
+                address: process.env.DEBUGSERVER || 'localhost',
+                port: process.env.DEBUGSERVER_PORT || 9000
             }, {
                 id: '00000000',
                 node: this.id,
