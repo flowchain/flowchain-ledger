@@ -47,7 +47,7 @@ var onmessage = function(req, res) {
     var device = {
         '@context': [
             'http://w3c.github.io/wot/w3c-wot-td-contxt.jsonld'
-        },
+        ],
         'name': '',
     };
 
@@ -122,7 +122,7 @@ server.start({
     onquery: onquery,
     ondata: ondata,
     join: {
-        address: process.argv[2] || 'localhost',
-        port: process.argv[3] || '8000'
+        address: '10.186.110.91',
+        port: '8000'
     }
 });
