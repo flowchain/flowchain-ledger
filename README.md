@@ -21,19 +21,11 @@ $ export PORT=8000
 $ node boot.js
 ```
 
-The server runs at ```192.168.1.1:8000```, and please modify the IP address and port number to fit your environment.
-
-```
-export PORT=8001
-node node1.js
-```
-
-Then, please open ```node.js``` and modify the ```join``` property:
+The server is running at ```192.168.1.1:8000```. Please modify the IP address and port number to fit your environment. Second, please open the ```node.js``` file and modify the ```join``` property:
 
 ```
 server.start({
-    onstart: onstart,
-	onmessage: onmessage,
+	...
 	join: {
 		address: '192.168.1.1',
 		port: 8000
@@ -41,6 +33,14 @@ server.start({
 });
 ```
 
+Start the peer node:
+
+```
+$ export PORT=8001
+$ node node.js
+```
+
+The peer node intends to join the p2p network via the ```192.168.1.1:8000``` node.
 
 ## History
 
