@@ -1,56 +1,53 @@
-![](https://raw.githubusercontent.com/flowchain/flowchain.github.io/master/images/logo-text%40128.png)
+![](https://flowchain.io/fb0/images/logo-text%40128.png)
 
-Private ledger that supports streaming and real-time data flow.
+Flowchain-ledger is a distributed ledger for the Internet of Things (IoT), and designed the software architecture from the ground up.
 
 # Introduction
 
-Flowchain is a private blockchain system for the Internet of Things, and it is a device server application for full scale hardware which is from MCU to mainstream servers.
+Flowchain created a new software architecture for the IoT blockchain to provide a distributed ledger programming framework for peer-to-peer IoT networks and real-time data transactions, and ```flowchain-ledger``` is the distributed ledger subsystem of the Flowchain framework.
 
-Flowchain leverages the emerging technologies of blockchain, peer-to-peer, web of things, IoT and open IoT cloud.
+This is a pre-release for coming public alpha, and it's not currently ready to use.
 
-## Testing
+## How to use
 
-To start a flowchain node:
+Start a flowchain boot node first:
 
 ```
-git clone https://github.com/flowchain/flowchain-core.git
-cd flowchain-core
-npm install
-node index.js
+$ git clone https://github.com/flowchain/flowchain-ledger.git
+$ cd flowchain-core
+$ npm install
+$ export HOST=192.168.1.1
+$ export PORT=8000
+$ node boot.js
 ```
 
-The server will start at ```localhost:8000``` by default. To start another flowchain node at port ```8001``` and join an existing network:
+The server runs at ```192.168.1.1:8000```, and please modify the IP address and port number to fit your environment.
 
 ```
 export PORT=8001
 node node1.js
 ```
 
-After ```index.js``` has been joined, its _successor_ will become ```node1.js```. To fix the default join node, please open ```node1.js``` and modify the ```join``` property:
+Then, please open ```node.js``` and modify the ```join``` property:
 
 ```
 server.start({
     onstart: onstart,
 	onmessage: onmessage,
 	join: {
-		address: 'localhost',
+		address: '192.168.1.1',
 		port: 8000
 	}
 });
 ```
 
-## Flowchain Modules
-
-* wotcity.io: [https://github.com/wotcity/wotcity-wot-framework](https://github.com/wotcity/wotcity-wot-framework)
-* flowchain: [https://github.com/flowchain/flowchain](https://github.com/flowchain/flowchain)
-* DevifyPlatform: [https://github.com/DevifyPlatform/devify-server](https://github.com/DevifyPlatform/devify-server)
-* node-p2p-chord: [https://github.com/jollen/node-p2p-chord](https://github.com/jollen/node-p2p-chord)
-* wwRPC: [https://github.com/jollen/wwRPC](https://github.com/jollen/wwRPC)
 
 ## History
 
-current:
+alpha-3: 2017.03.07
  * Add PicoDB support
+ * Support MediaTek LinkIt Smart 7688
+ * Pre-release for public alpha
 
 v0.5: 2016.12.28
  * Support transaction verify
