@@ -14,7 +14,7 @@ Start a flowchain boot node first:
 
 ```
 $ git clone https://github.com/flowchain/flowchain-ledger.git
-$ cd flowchain-core
+$ cd flowchain-ledger
 $ npm install
 $ export HOST=192.168.1.1
 $ export PORT=8000
@@ -36,11 +36,12 @@ server.start({
 Start the peer node:
 
 ```
+$ export HOST=192.168.1.2
 $ export PORT=8001
 $ node node.js
 ```
 
-The peer node intends to join the p2p network via the ```192.168.1.1:8000``` node.
+The peer node will intend to join the p2p network via the ```192.168.1.1:8000``` node.
 
 ## History
 
