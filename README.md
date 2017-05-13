@@ -74,6 +74,10 @@ v0.1: 2016.12.23
  * Ontology: blockchain, IoT, WoT, p2p and IoT hub/gateway.
  * Architecture: REST, RPC
 
+## Bibliography
+
+[1] Chen, J. (2017). Flowchain: A Distributed Ledger Designed for Peer-to-Peer IoT Networks and Real-time Data Transactions. In: 2nd International Workshop on Linked Data and Distributed Ledgers. Portoroz.
+
 ## License
 
 Copyright (C) 2016-present Jollen. The source code is licensed under the MIT license found in the [LICENSE](LICENSE) file.
