@@ -1,11 +1,19 @@
+var Flowchain = require('flowchain-ledger');
+
 // Import Websocket server
-var server = require('./server');
+var server = Flowchain.WoTServer;
 
 // Utils
-var crypto = require('crypto');
+var crypto = Flowchain.Utils.Crypto;
 
 // Database
-var Database = require('./database');
+var Database = Flowchain.DatabaseAdapter;
+
+
+/**
+ * Application Start Here
+ */
+
 var db = new Database('picodb');
 
 // Application event callbacks
