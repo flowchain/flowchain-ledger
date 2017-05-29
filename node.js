@@ -4,7 +4,7 @@ var Flowchain = require('flowchain-ledger');
 var server = Flowchain.WoTServer;
 
 // Utils
-var crypto = Flowchain.Utils.Crypto;
+var crypto = Flowchain.Crypto;
 
 // Database
 var Database = Flowchain.DatabaseAdapter;
