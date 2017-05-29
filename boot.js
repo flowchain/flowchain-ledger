@@ -1,14 +1,23 @@
+var Flowchain = require('flowchain-ledger');
+
 // Import Websocket server
-var server = require('./server');
+var server = Flowchain.WoTServer;
 
 // Utils
-var crypto = require('crypto');
+var crypto = Flowchain.Crypto;
 
 // Database
-var Database = require('./database');
-var db = new Database('picodb');
+var Database = Flowchain.DatabaseAdapter;
 
-// Application event callbacks
+
+/**
+ * Application Start Here
+ */
+
+/**
+ * Application event callbacks. 
+ * I am the successor node of the data.
+ */
 var onmessage = function(req, res) {
     var payload = req.payload;
     var block = req.block;
@@ -99,7 +108,10 @@ var onquery = function(req, res) {
     });
 };
 
-// Application event callbacks
+/**
+ * Application event callbacks. 
+ * Forward the data over the Chord ring.
+ */
 var ondata = function(req, res) {
     var data = req.data;
     var put = res.save;
