@@ -8,6 +8,13 @@ Flowchain created a new software architecture for the IoT blockchain to provide 
 
 This is a pre-release for coming public alpha, and it's not currently ready to use.
 
+# Features
+
+* Mining-based Proof-of-Stake (PoS)
+* Run on every IoT node
+* RPC over the Websocket protocol
+* Distributed Hash Table (DHT) by the Chord protocol
+
 ## How to use
 
 Start a flowchain boot node first:
