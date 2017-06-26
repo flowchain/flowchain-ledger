@@ -17,7 +17,7 @@ This is a pre-release for coming public alpha, and it's not currently ready to u
 
 ## How to use
 
-Start a flowchain boot node first:
+Start a flowchain boot node:
 
 ```
 $ git clone https://github.com/flowchain/flowchain-ledger.git
@@ -28,27 +28,19 @@ $ export PORT=8000
 $ node boot.js
 ```
 
-The server is running at ```192.168.1.1:8000```. Please modify the IP address and port number to fit your environment. Second, please open the ```node.js``` file and modify the ```join``` property:
+The boot node is now running at the address ```192.168.1.1:8000```. Please modify the IP address and port number to fit your environment. 
+
+Next, to start a peer node and join the boot node:
 
 ```
-server.start({
-	...
-	join: {
-		address: '192.168.1.1',
-		port: 8000
-	}
-});
+$ export HOST=192.168.1.2				; Peer Node
+$ export PORT=8001								; Peer Node
+$ export PEER_ADDR=192.168.1.1		; Boot Node
+$ export PEER_PORT=8000					; Boot Node
+$ node node.js										; Start the peer node
 ```
 
-Start the peer node:
-
-```
-$ export HOST=192.168.1.2
-$ export PORT=8001
-$ node node.js
-```
-
-The peer node will intend to join the p2p network via the ```192.168.1.1:8000``` node.
+The peer node will run at the address ```192.168.1.2:8001```, and subsequently join the boot node at the address ```192.168.1.1:8000```. The peer node will intend to join the p2p network.
 
 ## Bibliography
 
