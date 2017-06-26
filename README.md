@@ -33,18 +33,22 @@ The boot node is now running at the address ```192.168.1.1:8000```. Please modif
 Next, to start a peer node and join the boot node:
 
 ```
-$ export HOST=192.168.1.2			; Peer Node
-$ export PORT=8001					; Peer Node
-$ export PEER_ADDR=192.168.1.1		; Boot Node
-$ export PEER_PORT=8000				; Boot Node
-$ node node.js						; Start the peer node
+$ export HOST=192.168.1.2           ; Peer Node
+$ export PORT=8001                  ; Peer Node
+$ export PEER_ADDR=192.168.1.1      ; Boot Node
+$ export PEER_PORT=8000             ; Boot Node
+$ node node.js                      ; Start the peer node
 ```
 
 The peer node will run at the address ```192.168.1.2:8001```, and subsequently join the boot node at the address ```192.168.1.1:8000```. The peer node will intend to join the p2p network.
 
 ## Bibliography
 
+This work is based on the research papers.
+
 [1] Chen, J. (2017). [Flowchain: A Distributed Ledger Designed for Peer-to-Peer IoT Networks and Real-time Data Transactions.](https://sites.google.com/site/lddleswc17/program) In: 2nd International Workshop on Linked Data and Distributed Ledgers. Portoroz.
+
+[2] Chen, J. (2017). [Devify: Decentralized Internet of Things Software Framework for a Peer-to-Peer and Interoperable IoT Device](https://sites.google.com/view/aiotas2017/program?authuser=0) In: Advances in IoT Architecture and Systems. Toronto, Canada.
 
 ## License
 
