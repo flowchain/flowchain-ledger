@@ -1,12 +1,12 @@
 ![](https://flowchain.io/fb0/images/logo-text%40128.png)
 
-Flowchain-ledger is a distributed ledger for the Internet of Things (IoT), and designed the software architecture from the ground up.
+Flowchain-ledger is a distributed ledger technology (DLT) for the Internet of Things (IoT) devices (aka. IoT Blockchain). The Flowchain software framework is designed from the ground up to fit current IoT needs.
 
 # Introduction
 
-Flowchain created a new software architecture for the IoT blockchain to provide a distributed ledger programming framework for peer-to-peer IoT networks and real-time data transactions, and ```flowchain-ledger``` is the distributed ledger subsystem of the Flowchain framework.
+Flowchain is a software framework for the IoT blockchain to provide a distributed ledger programming framework for peer-to-peer IoT networks and real-time data transactions, and ```flowchain-ledger``` is the Node.js distribution for heterogeneous hardware devices, such as MediaTek LinkIt Smart 7688, Raspberry Pi, laptops, smart phones and etc.
 
-This is a pre-release for coming public alpha, and it's not currently ready to use.
+This is a beta release, and it's now ready to be evaluated.
 
 # Features
 
