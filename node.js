@@ -1,4 +1,5 @@
-var Flowchain = require('flowchain-ledger');
+if (!module.parent)
+    Flowchain = require('./index');
 
 // Import Websocket server
 var server = Flowchain.WoTServer;
@@ -123,14 +124,21 @@ var ondata = function(req, res) {
     put(data);
 };
 
-// Start the server
-server.start({
+// The default implementations.
+var callbacks = {
     onstart: onstart,
     onmessage: onmessage,
     onquery: onquery,
     ondata: ondata,
     join: {
-        address: '10.186.110.91',
-        port: '8000'
+        address: process.env['PEER_ADDR'] || 'localhost',
+        port: process.env['PEER_PORT'] || '8000'
     }
-});
+};
+
+if (typeof(module) != "undefined" && typeof(exports) != "undefined")
+    module.exports = callbacks
+
+// Start the server
+if (!module.parent)
+    server.start(callbacks);
