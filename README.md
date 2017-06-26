@@ -44,7 +44,7 @@ The peer node will run at the address ```192.168.1.2:8001```, and subsequently j
 
 ## Bibliography
 
-[1] Chen, J. (2017). Flowchain: A Distributed Ledger Designed for Peer-to-Peer IoT Networks and Real-time Data Transactions. In: 2nd International Workshop on Linked Data and Distributed Ledgers. Portoroz.
+[1] Chen, J. (2017). [Flowchain: A Distributed Ledger Designed for Peer-to-Peer IoT Networks and Real-time Data Transactions.](https://sites.google.com/site/lddleswc17/program) In: 2nd International Workshop on Linked Data and Distributed Ledgers. Portoroz.
 
 ## License
 
