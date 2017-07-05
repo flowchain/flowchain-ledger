@@ -28,9 +28,11 @@
 
 'use strict';
 
-// Chord protocols
+/**
+ * The RPC operations built upon Chord protocols.
+ */
 var Chord = {
-    NOTIFY_STABILZE: 0,
+    NOTIFY_STABILIZE: 0,
     NOTIFY_PREDECESSOR: 1,
     NOTIFY_SUCCESSOR: 2,
     NOTIFY_JOIN: 3,

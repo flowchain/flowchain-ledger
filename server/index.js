@@ -353,10 +353,10 @@ Server.prototype.read = function(key) {
 };
 
 /**
- * Send Chord message.
+ * The RPC to send a Chord message.
  *
- * @param to {Object} - { address: '127.0.0.1', port: 8000 }
- * @param packet {Object} - { type: 2, id: 'b283326930a8b2baded20bb1cf5b6358' }
+ * @param to {Object} - Destination. e.g. { address: '127.0.0.1', port: 8000 }
+ * @param packet {Object} - Data payload e.g. { type: 2, id: 'b283326930a8b2baded20bb1cf5b6358' }
  * @returns {None}
  * @api public
  */
@@ -369,6 +369,8 @@ Server.prototype.sendChordMessage = function(to, packet) {
     message: packet.message,
     from: packet.from
   };
+
+  // Connection cache
   var connection = connections[host] || null;
 
   if (ChordUtils.DebugServer)
