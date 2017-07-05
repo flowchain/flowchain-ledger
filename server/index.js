@@ -74,6 +74,12 @@ var deserialize = JSON.parse;
 var Miner = require('../block/mining');      // Import flowchain miner
 var block = require('../block/genesis');     // Import flowchain genesis block
 
+/*
+ * Consensus systems
+ */
+var Consensus = require('../Consensus');
+var bi = new Consensus.BI;
+
 /**
  * WebSocket URL Router
  */
