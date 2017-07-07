@@ -132,12 +132,12 @@ Node.prototype._startUpdateFingers = function() {
     };
 
     // Stabilize
-    setInterval(function stabilize() {
+    this._stabilize = setInterval(function stabilize() {
         this.send(this.successor, { type: Chord.NOTIFY_STABILZE });
     }.bind(this), 2500);
 
     // Failure check
-    setInterval(function check_predecessor() {
+    this._check_predecessor = setInterval(function check_predecessor() {
         if (ChordUtils.DebugFailureCheck) {
             console.log('predecessor_ttl =', this.predecessor_ttl);
         }
@@ -154,7 +154,7 @@ Node.prototype._startUpdateFingers = function() {
     }.bind(this), 1500);
 
     // Failure check
-    setInterval(function check_successor() {
+    this._check_successor = setInterval(function check_successor() {
         if (ChordUtils.DebugFailureCheck) {
             console.log('successor_ttl =', this.successor_ttl);
         }
@@ -168,7 +168,14 @@ Node.prototype._startUpdateFingers = function() {
         this.send(this.successor, { type: Chord.CHECK_SUCESSOR, successor_ttl: this.successor_ttl });
     }.bind(this), 3500);
 
-    setInterval(fix_fingers.bind(this), 5000);
+    this._fix_fingers = setInterval(fix_fingers.bind(this), 5000);
+}
+
+Node.prototype.clearIntervals = function() {
+    clearInterval(this._fix_fingers);
+    clearInterval(this._check_successor);
+    clearInterval(this._check_predecessor);
+    clearInterval(this._stabilize);
 }
 
 /*

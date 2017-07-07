@@ -101,6 +101,7 @@ function Server() {
   this.host = process.env.HOST || 'localhost';
   this.endpoint = process.env.ENDPOINT || null;
   this.thingid = process.env.THINGID || '5550937980d51931b3000009';
+  this.server = null;
 
   // initialize the public attributes
   this.nodes = {};
@@ -131,6 +132,8 @@ function Server() {
 
   // Create a new miner
   this.miner = new Miner();
+  this._miner_id = 0;
+
   // Blocks
   this.blockchain = [];
 };
@@ -291,6 +294,8 @@ Server.prototype.start = function(options) {
 
   server.start(router.route, wsHandlers);
 
+  this.server = server;
+
   console.log('----- Genesis Block -----');
   console.log( JSON.stringify(block) );
 
@@ -301,7 +306,7 @@ Server.prototype.start = function(options) {
   miner.setPreviousBlock(block);
 
   // Start to generate a hash
-  setInterval(function() {
+  this._miner_id = setInterval(function() {
       miner.generateHash();
 
       // A success hash is generated
@@ -338,6 +343,20 @@ Server.prototype.start = function(options) {
     this._options.onstart(req, res);
   }
 };
+
+/**
+ * Shutdown the Websocket server.
+ *
+ * @param cb {Function} The complete callback
+ * @return {}
+ * @api public
+ */
+Server.prototype.shutdown = function(cb) {
+  clearInterval(this._miner_id);
+  this.node.clearIntervals();
+  if (this.server)
+    this.server.shutdown(cb);
+}
 
 /*
  * CRUD of data query

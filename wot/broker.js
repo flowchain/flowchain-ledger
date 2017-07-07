@@ -61,6 +61,8 @@ function WebsocketBroker(options) {
   this.port = options.port || 8000;
   this.endpoint = options.endpoint || null;
   this.thingid = options.thingid || '5550937980d51931b3000009';
+  this.wsServer = null;
+  this.httpServer = null;
 }
 
 util.inherits(WebsocketBroker, EventEmitter);
@@ -116,7 +118,7 @@ WebsocketBroker.prototype.dispatchStatus = function(path, data) {
 };
 
 /**
- * Start websocket server.
+ * Start the Websocket server.
  *
  * @param {Object} route
  * @return {}
@@ -135,14 +137,17 @@ WebsocketBroker.prototype.start = function(route, handlers) {
   this.host = host;
   this.endpoint = endpoint;
 
-  var server = http.createServer(this.onRequest).listen(port, host, function() {
+  var httpServer = http.createServer(this.onRequest).listen(port, host, function() {
       console.info('node is running at ws://' + self.host + ':' + self.port);
   });
 
   var wsServer = new WebSocketServer({
-    httpServer: server,
+    httpServer: httpServer,
     autoAcceptConnections: false
   });
+
+  this.httpServer = httpServer;
+  this.wsServer = wsServer;
 
   /**
    * handlers
@@ -192,4 +197,20 @@ WebsocketBroker.prototype.start = function(route, handlers) {
 
   wsServer.on('request', onWsRequest);
   wsServer.on('connect', onWsConnect);
+};
+
+/**
+ * Shutdown the Websocket server.
+ *
+ * @param cb {Function} The complete callback
+ * @return {}
+ * @api public
+ */
+WebsocketBroker.prototype.shutdown = function(cb) {
+    var self = this;
+
+    this.httpServer.close(function() {
+        self.wsServer.shutDown();
+        if (typeof cb === 'function') return cb();
+    });
 };
