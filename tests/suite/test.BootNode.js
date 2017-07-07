@@ -13,8 +13,8 @@ var crypto = Flowchain.Crypto;
 var Database = Flowchain.DatabaseAdapter;
 
 vows.describe('Chord Development Environment').addBatch({
-    'Testing server.start()': {
-        'is 4-bytes length': function () {
+    'Testing Boot Node': {
+        'is server started': function () {
 
             var onstart = function(req, res) {
                 // Chord node ID
@@ -22,8 +22,8 @@ vows.describe('Chord Development Environment').addBatch({
                 var address = req.node.address;
 
                 assert.strictEqual(id.length, 40);
+
                 server.shutdown(function() {
-                    process.exit(0);
                 });
             };
 
