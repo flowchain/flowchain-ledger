@@ -77,7 +77,7 @@ var block = require('../block/genesis');     // Import flowchain genesis block
 /*
  * Consensus systems
  */
-var Consensus = require('../Consensus');
+var Consensus = require('../consensus');
 var bi = new Consensus.BI;
 
 /**
