@@ -24,6 +24,7 @@ vows.describe('Chord Development Environment').addBatch({
                 assert.strictEqual(id.length, 40);
 
                 server.shutdown(function() {
+                    process.exit(0);
                 });
             };
 
