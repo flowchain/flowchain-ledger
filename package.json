@@ -14,10 +14,11 @@
     "underscore": "^1.8.3",
     "utils-merge": "^1.0.0",
     "uuid": "^3.0.1",
+    "vows": "^0.8.1",
     "websocket": "^1.0.23"
   },
-  "devDependencies": {},
   "scripts": {},
+  "devDependencies": {},
   "author": "jollen",
   "engines": {
     "node": "4.4"

@@ -1,5 +1,7 @@
 ![](https://flowchain.io/fb0/images/logo-text%40128.png)
 
+[![Build Status](https://travis-ci.org/flowchain/flowchain-ledger.svg?branch=master)](https://travis-ci.org/flowchain/flowchain-ledger.svg?branch=master)
+
 Flowchain-ledger is a distributed ledger technology (DLT) for the Internet of Things (IoT) devices (aka. IoT Blockchain). The Flowchain software framework is designed from the ground up to fit current IoT needs.
 
 # Introduction
