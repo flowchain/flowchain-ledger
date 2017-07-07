@@ -19,7 +19,7 @@
     "websocket": "^1.0.23"
   },
   "scripts": {
-    "test": "./node_modules/.bin/vows tests/suite/test.*.js --spec"
+    "test": "make test"
   },
   "devDependencies": {},
   "author": "jollen",
