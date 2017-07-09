@@ -16,6 +16,7 @@ This is a beta release, and it's now ready to be evaluated.
 * Run on every IoT node
 * RPC over the Websocket protocol
 * Distributed Hash Table (DHT) by the Chord protocol
+* The device server in Web of Things (WoT) architecture
 
 ## How to use
 
