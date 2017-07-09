@@ -9,7 +9,7 @@ var crypto = Flowchain.Crypto;
 
 // Database
 var Database = Flowchain.DatabaseAdapter;
-
+var db = new Database('picodb');
 
 /**
  * Application Start Here
