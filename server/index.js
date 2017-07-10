@@ -77,8 +77,8 @@ var block = require('../block/genesis');     // Import flowchain genesis block
 /*
  * Consensus systems
  */
-var Consensus = require('../consensus');
-var bi = new Consensus.BI;
+var BFT = require('../consensus');
+var bft = new BFT;
 
 /**
  * WebSocket URL Router
