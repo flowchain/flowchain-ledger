@@ -1,7 +1,7 @@
 var vows = require('vows'),
     assert = require('assert');
 
-var Flowchain = require('../../index');
+var Flowchain = require('../../libs');
 
 // Import Websocket server
 var server = Flowchain.WoTServer;
