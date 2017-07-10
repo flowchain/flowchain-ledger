@@ -31,19 +31,25 @@ $ export PORT=8000
 $ node boot.js
 ```
 
-The boot node is now running at the address ```192.168.1.1:8000```. Please modify the IP address and port number to fit your environment. 
-
-Next, to start a peer node and join the boot node:
+The boot node is now running at the address ```192.168.1.1:8000```. Please modify the IP address and listening port number to match your own environment. Subsequently, to start a peer node and join the boot node:
 
 ```
-$ export HOST=192.168.1.2           ; Peer Node
-$ export PORT=8001                  ; Peer Node
-$ export PEER_ADDR=192.168.1.1      ; Boot Node
-$ export PEER_PORT=8000             ; Boot Node
-$ node node.js                      ; Start the peer node
+$ export HOST=192.168.1.2           ; Peer Node (My IP address)
+$ export PORT=8001                  ; Peer Node (My listening port)
+$ export PEER_ADDR=192.168.1.1      ; Boot Node (The node intend to join)
+$ export PEER_PORT=8000             ; Boot Node (The node intend to join)
+$ node peer.js                      ; Start the new peer node
 ```
 
-The peer node will run at the address ```192.168.1.2:8001```, and subsequently join the boot node at the address ```192.168.1.1:8000```. The peer node will intend to join the p2p network.
+The new peer node will run at the address ```192.168.1.2:8001```, and subsequently join the boot node at the address ```192.168.1.1:8000```. The peer node will intend to join the p2p network. Furthuremore, you can start another peer node and join the p2p network through the boot node or one of the peer nodes. For example, to start another peer node and join the peer node at ```192.168.1.2:8001```:
+
+```
+$ export HOST=192.168.1.2
+$ export HOST=8002
+$ export PEER_ADDR=192.168.1.2
+$ export PEER_PORT=8001
+$ node peer.js
+```
 
 ## Developer Guide
 
