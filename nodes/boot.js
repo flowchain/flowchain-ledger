@@ -1,5 +1,5 @@
-if (!module.parent)
-    Flowchain = require('./index');
+// Import the Flowchain library
+var Flowchain = require('../libs');
 
 // Import Websocket server
 var server = Flowchain.WoTServer;
@@ -12,11 +12,11 @@ var Database = Flowchain.DatabaseAdapter;
 var db = new Database('picodb');
 
 /**
- * Application Start Here
+ * The Application Layer
  */
 
 /**
- * Application event callbacks. 
+ * Application event callbacks.
  * I am the successor node of the data.
  */
 var onmessage = function(req, res) {
@@ -110,7 +110,7 @@ var onquery = function(req, res) {
 };
 
 /**
- * Application event callbacks. 
+ * Application event callbacks.
  * Forward the data over the Chord ring.
  */
 var ondata = function(req, res) {
@@ -120,17 +120,27 @@ var ondata = function(req, res) {
     put(data);
 };
 
-// The default implementations.
-var callbacks = {
-    onstart: onstart,
-    onmessage: onmessage,
-    onquery: onquery,
-    ondata: ondata
+function BootNode() {
+    this.server = server;
+}
+
+BootNode.prototype.start = function(options) {
+    this.server.start({
+        onstart: onstart,
+        onmessage: onmessage,
+        onquery: onquery,
+        ondata: ondata
+    });
 };
 
 if (typeof(module) != "undefined" && typeof(exports) != "undefined")
-    module.exports = callbacks
+    module.exports = BootNode;
 
 // Start the server
 if (!module.parent)
-    server.start(callbacks);
+    server.start({
+        onstart: onstart,
+        onmessage: onmessage,
+        onquery: onquery,
+        ondata: ondata
+    });

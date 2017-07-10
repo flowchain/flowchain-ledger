@@ -1,5 +1,5 @@
-if (!module.parent)
-    Flowchain = require('./index');
+// Import the Flowchain library
+var Flowchain = require('../libs');
 
 // Import Websocket server
 var server = Flowchain.WoTServer;
@@ -9,13 +9,11 @@ var crypto = Flowchain.Crypto;
 
 // Database
 var Database = Flowchain.DatabaseAdapter;
-
+var db = new Database('picodb');
 
 /**
- * Application Start Here
+ * The Application Layer
  */
-
-var db = new Database('picodb');
 
 // Application event callbacks
 var onmessage = function(req, res) {
@@ -124,21 +122,35 @@ var ondata = function(req, res) {
     put(data);
 };
 
-// The default implementations.
-var callbacks = {
-    onstart: onstart,
-    onmessage: onmessage,
-    onquery: onquery,
-    ondata: ondata,
-    join: {
-        address: process.env['PEER_ADDR'] || 'localhost',
-        port: process.env['PEER_PORT'] || '8000'
-    }
+function PeerNode() {
+    this.server = server;
+}
+
+PeerNode.prototype.start = function(options) {
+    this.server.start({
+        onstart: onstart,
+        onmessage: onmessage,
+        onquery: onquery,
+        ondata: ondata,
+        join: {
+            address: process.env['PEER_ADDR'] || 'localhost',
+            port: process.env['PEER_PORT'] || '8000'
+        }
+    });
 };
 
 if (typeof(module) != "undefined" && typeof(exports) != "undefined")
-    module.exports = callbacks
+    module.exports = PeerNode;
 
 // Start the server
 if (!module.parent)
-    server.start(callbacks);
+    server.start({
+        onstart: onstart,
+        onmessage: onmessage,
+        onquery: onquery,
+        ondata: ondata,
+        join: {
+            address: process.env['PEER_ADDR'] || 'localhost',
+            port: process.env['PEER_PORT'] || '8000'
+        }
+    });
