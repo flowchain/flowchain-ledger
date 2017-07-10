@@ -45,6 +45,10 @@ $ node node.js                      ; Start the peer node
 
 The peer node will run at the address ```192.168.1.2:8001```, and subsequently join the boot node at the address ```192.168.1.1:8000```. The peer node will intend to join the p2p network.
 
+## Developer Guide
+
+* [How to send sensory data to the p2p network](https://github.com/flowchain/flowchain-ledger/wiki/Sending-Data-to-P2P-Network)
+
 ## Bibliography
 
 This work is based on the research papers.
