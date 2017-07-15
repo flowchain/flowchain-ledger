@@ -54,6 +54,7 @@ $ node peer.js
 ## Developer Guide
 
 * [How to send sensory data to the p2p network](https://github.com/flowchain/flowchain-ledger/wiki/Sending-Data-to-P2P-Network)
+* [How to use the APIs](https://github.com/flowchain/flowchain-ledger/wiki/APIs)
 
 ## Bibliography
 
