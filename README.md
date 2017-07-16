@@ -56,7 +56,15 @@ $ node peer.js
 * [How to send sensory data to the p2p network](https://github.com/flowchain/flowchain-ledger/wiki/Sending-Data-to-P2P-Network)
 * [How to use the APIs](https://github.com/flowchain/flowchain-ledger/wiki/APIs)
 
-## Bibliography
+## Publication
+
+### Presentation
+
+* [Flowchain: A Case Study on Building a Blockchain for the IoT in Node.js - Jollen Chen, Flowchain.co
+](https://lc3china2017.sched.com/event/Aedw/flowchain-a-case-study-on-building-a-blockchain-for-the-iot-in-nodejs-ce-jollen-chen-flowchainco), LinuxCon + ContainerCon + CloudOpen (LC3), Beijing, China, June 19-20, 2017.
+
+
+### Bibliography
 
 This work is based on the research papers.
 
