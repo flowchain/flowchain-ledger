@@ -56,6 +56,10 @@ $ node peer.js
 * [How to send sensory data to the p2p network](https://github.com/flowchain/flowchain-ledger/wiki/Sending-Data-to-P2P-Network)
 * [How to use the APIs](https://github.com/flowchain/flowchain-ledger/wiki/APIs)
 
+## Use Cases
+
+* [Chunk store IoT server that is abstract-chunk-store compliant built using memory as the storage backend.](https://github.com/jollen/devify-chunk-store)
+
 ## Publication
 
 ### Presentation
