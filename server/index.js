@@ -143,7 +143,7 @@ function Server() {
  */
 Server.prototype.onData = function(payload) {
   // Parse the data received from Chord node (WebSocket client)
-  var packet = deserialize(payload.data);
+  var packet = typeof payload.data === 'object' ? payload.data : deserialize(payload.data);
 
   // Request URI
   var pathname = payload.pathname;
