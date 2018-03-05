@@ -76,6 +76,24 @@ This work is based on the research papers.
 
 [2] Chen, J. (2017). [Devify: Decentralized Internet of Things Software Framework for a Peer-to-Peer and Interoperable IoT Device](https://sites.google.com/view/aiotas2017/program?authuser=0) In: Advances in IoT Architecture and Systems. Toronto, Canada.
 
+### How to Cite
+
+```
+@article{flowchain_2017,
+title={Flowchain: A Distributed Ledger Designed for Peer-to-Peer IoT Networks and Real-time Data Transactions},
+journal={Proceedings of the 2nd International Workshop on Linked Data and Distributed Ledgers (LDDL2)},
+author={Chen, Jollen},
+year={2017}
+},
+
+@article{devify_2017,
+title={Devify: Decentralized Internet of Things Software Framework for a Peer-to-Peer and Interoperable IoT Device},
+journal={Proceedings of the Workshop on Advances in IoT Architecture and Systems (AIoTAS2017)},
+author={Chen, Jollen},
+year={2017}
+},
+```
+
 ## License
 
 Copyright (C) 2016-present Jollen. The source code is licensed under the MIT license found in the [LICENSE](LICENSE) file.
