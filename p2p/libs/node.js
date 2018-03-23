@@ -133,7 +133,7 @@ Node.prototype._startUpdateFingers = function() {
 
     // Stabilize
     this._stabilize = setInterval(function stabilize() {
-        this.send(this.successor, { type: Chord.NOTIFY_STABILZE });
+        this.send(this.successor, { type: Chord.NOTIFY_STABILIZE });
     }.bind(this), 2500);
 
     // Failure check
@@ -293,7 +293,7 @@ Node.prototype.dispatch = function(_from, _message) {
 
     switch (message.type) {
         // N notifies its successor for predecessor
-        case Chord.NOTIFY_STABILZE:
+        case Chord.NOTIFY_STABILIZE:
             /*
              *  n.stabilize()
              *    x = successor.predecessor;
@@ -302,7 +302,7 @@ Node.prototype.dispatch = function(_from, _message) {
              *    successor.notify(n);
              */
             if (ChordUtils.DebugStabilize)
-                console.log('NOTIFY_STABILZE: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
+                console.log('NOTIFY_STABILIZE: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
 
             // N might be our predecessor
             if (this.predecessor === null) {
