@@ -61,6 +61,7 @@ var onmessage = function(req, res) {
     db.put(hash, tx, function (err) {
         if (err)
             return console.log('Ooops! onmessage =', err) // some kind of I/O error
+        console.log('[Blockchain]', tx, 'is in Block#' + block.no, ', its data key =', key);                
 
         // fetch by key
         db.get(hash, function (err, value) {
@@ -69,11 +70,11 @@ var onmessage = function(req, res) {
             if (err)
                 return console.log('Ooops! onmessage =', err) // likely the key was not found
 
-            console.log('[Blockchain]', value, 'is in Block#' + block.no, ', its data key =', key);
             console.log('[Blockchain] verifying tx =', key);
 
             res.read(key);
         });
+      
     });
 };
 
@@ -126,15 +127,42 @@ function PeerNode() {
     this.server = server;
 }
 
+/**
+ * Submit a transaction to the Flowchain p2p network
+ *
+ * @param {Object} data
+ * @return {Object}
+ * @api public
+ */
+PeerNode.prototype.submit = function(data) {
+    this.server.save(data);
+}
+
+/**
+ * Create a Flowchain Ledger node
+ *
+ * @param {Object} options 
+ * @return {Object}
+ * @api public
+ */
 PeerNode.prototype.start = function(options) {
+    var peerAddr = 'localhost';
+    var peerPort = '8000';
+    if (!options) options = {};
+
+    if (options.join) {
+        peerAddr = options.join.address || peerAddr;
+        peerPort = options.join.port || peerPort;
+    }
+
     this.server.start({
-        onstart: onstart,
-        onmessage: onmessage,
-        onquery: onquery,
-        ondata: ondata,
+        onstart: options.onstart || onstart,
+        onmessage: options.onmessage || onmessage,
+        onquery: options.onquery || onquery,
+        ondata: options.ondata || ondata,
         join: {
-            address: process.env['PEER_ADDR'] || 'localhost',
-            port: process.env['PEER_PORT'] || '8000'
+            address: process.env['PEER_ADDR'] || peerAddr,
+            port: process.env['PEER_PORT'] || peerPort
         }
     });
 };
