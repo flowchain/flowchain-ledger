@@ -2,7 +2,11 @@
 
 ## Beta Stage
 
-(TBD)
+beta-v0.2: 2018.03.23
+ * Prepare for the "v1.0"
+ * Node.js 0.10 ready for ARM9TDMI microprocessors
+ * Node.js 0.12 ready for MIPS microprocessors
+ * Node.js v6+ ready for laptops, desktops and servers
 
 ## Alpha Stage
 
