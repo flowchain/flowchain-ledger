@@ -51,6 +51,20 @@ $ export PEER_PORT=8001
 $ node peer.js
 ```
 
+## Use of Debug Tool
+
+The [flowchain-sim](https://github.com/flowchain/flowchain-sim) project is a conveient tool that you can debug flowchain-ledger by watching the activities of the underlying p2p networking. Please start the debug tool `flowchain-sim`, and use the `DEBUGSERVER` and `DEBUGSERVER_PORT` environment variables:
+
+```
+$ export HOST=192.168.1.2           ; Peer Node (My IP address)
+$ export PORT=8001                  ; Peer Node (My listening port)
+$ export PEER_ADDR=192.168.1.1      ; Boot Node (The node intend to join)
+$ export PEER_PORT=8000             ; Boot Node (The node intend to join)
+$ export DEBUGSERVER=192.168.1.100  ; The debug server IP address (Optional)
+$ export DEBUGSERVER_PORT=9000 	    ; The debug server listening port number (Optional)
+$ node peer.js                      ; Start the new peer node
+```
+
 ## Developer Guide
 
 * [How to send sensory data to the p2p network](https://github.com/flowchain/flowchain-ledger/wiki/Sending-Data-to-P2P-Network)
