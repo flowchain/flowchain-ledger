@@ -1,4 +1,4 @@
-![](https://flowchain.io/fb0/images/logo-text%40128.png)
+![](https://flowchain.co/static/logo-text@128.png)
 
 [![Build Status](https://travis-ci.org/flowchain/flowchain-ledger.svg?branch=master)](https://travis-ci.org/flowchain/flowchain-ledger)
 
