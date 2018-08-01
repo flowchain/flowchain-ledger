@@ -44,14 +44,22 @@ var onmessage = function(req, res) {
                         .update( key )
                         .digest('hex');
 
-    // Generate an asset
+    // Generate an asset and send it to the endpoint
     var asset = {
         // Data key
         key: key
     };
-
-    // Give out the asset
     //res.send(asset);
+
+    // Send ACK back
+    var ack = {
+        key: key,
+        status: 'ACK'
+    };
+    if (node.address !== from.address ||
+        node.port !== from.port) {
+        node.send(from, ack);
+    }
 
     db.put(hash, tx, function (err) {
         if (err)

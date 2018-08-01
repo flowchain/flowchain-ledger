@@ -58,6 +58,16 @@ var onmessage = function(req, res) {
         'name': '',
     };
 
+    // Send ACK back
+    var ack = {
+        key: key,
+        status: 'ACK'
+    };
+    if (node.address !== from.address ||
+        node.port !== from.port) {
+        node.send(from, ack);
+    }
+
     db.put(hash, tx, function (err) {
         if (err)
             return console.log('Ooops! onmessage =', err) // some kind of I/O error
