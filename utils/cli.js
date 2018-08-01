@@ -1,5 +1,6 @@
 // Import Websocket server
-var server = require('./server');
+var PeerNode = require('../index').PeerNode;
+var node = new PeerNode();
 
 // Application event callbacks
 var ondata = function(req, res) {
@@ -10,7 +11,7 @@ var ondata = function(req, res) {
 };
 
 // Start the server
-server.start({
+node.start({
     ondata: ondata,
     join: {
         address: 'localhost',

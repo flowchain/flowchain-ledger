@@ -29,14 +29,5 @@ client.on('connect', function(connection) {
         }
 });
 
-//client.connect('ws://wot.city/object/5550937980d51931b3000009/send', '');
-client.connect('ws://localhost:8001/object/5550937980d51931b3000009/send', '');
-
-
-
-
-
-
-
-
+client.connect('ws://localhost:8000/object/5550937980d51931b3000009/send', '');
 
