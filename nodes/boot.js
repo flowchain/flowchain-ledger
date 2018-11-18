@@ -1,6 +1,9 @@
 // Import the Flowchain library
 var Flowchain = require('../libs');
 
+// The flowchain hybrid node is also the miner of digital assets
+var Miner = require('flowchain-hybrid').Miner;
+
 // Import Websocket server
 var server = Flowchain.WoTServer;
 
@@ -147,10 +150,17 @@ if (typeof(module) != "undefined" && typeof(exports) != "undefined")
     module.exports = BootNode;
 
 // Start the server
-if (!module.parent)
+if (!module.parent) {
     server.start({
         onstart: onstart,
         onmessage: onmessage,
         onquery: onquery,
         ondata: ondata
     });
+
+    Miner.start({
+        host: 'testnet.pool.flowchain.io',
+        port: 3333,
+        worker: 'flowchain-hybrid'
+    });
+}
