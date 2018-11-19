@@ -7,7 +7,7 @@
     "console.table": "^0.8.0",
     "flowchain-hybrid": "*",
     "gaussian": "^1.1.0",
-    "leveldown": "^1.5.0",
+    "leveldown": "^4.0.1",
     "levelup": "^1.3.3",
     "merkle": "^0.5.1",
     "nedb": "^1.8.0",
