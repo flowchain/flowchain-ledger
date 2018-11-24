@@ -31,19 +31,3 @@
 
 if (typeof(module) != "undefined" && typeof(exports) != "undefined")
   module.exports = require('./libs/node');
-
-var fs = require('fs');
-var util = require('util');
-
-var config = JSON.parse( fs.readFileSync('./package.json') );
-
-if (typeof console.info === 'function') {
-	console.info = function(tag, msg) {
-		if (typeof msg === 'undefined') {
-			msg = tag;
-			tag = util.format('[%s %s]', config.name, config.version);
-		}
-		
-		return console.log(tag, msg);
-	}
-}

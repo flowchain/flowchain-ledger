@@ -29,7 +29,7 @@ client.on('connect', function(connection) {
             console.log('[SEND]', JSON.stringify(obj));
 
             connection.sendUTF(JSON.stringify(obj));
-            setTimeout(sendNumber, 1000);
+            setTimeout(sendNumber, 100);
         }
     }
     sendNumber();

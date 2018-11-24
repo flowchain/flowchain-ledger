@@ -1,3 +1,8 @@
+
+// The Flowchain log system
+var Log = require('../utils/Log');
+var TAG = 'Blockchain';
+
 // Import the Flowchain library
 var Flowchain = require('../libs');
 
@@ -32,7 +37,7 @@ var onmessage = function(req, res) {
 
     // Get a block
     if (!block) {
-        console.log('[Blockchain] no usable block now, data is ignored.');
+        Log.i(TAG, 'No blocks now, ignore data.');
         return;
     }
 
@@ -69,18 +74,19 @@ var onmessage = function(req, res) {
     }
 
     db.put(hash, tx, function (err) {
-        if (err)
-            return console.log('Ooops! onmessage =', err) // some kind of I/O error
-        console.log('[Blockchain]', tx, 'is in Block#' + block.no, ', its data key =', key);                
+        if (err) {
+            return Log.e(TAG, 'Ooops! onmessage =', err) // some kind of I/O error
+        }
+
+        Log.v(TAG, 'Transactions #' + key + 'found in Block#' + block.no);
 
         // fetch by key
         db.get(hash, function (err, value) {
-        console.log('[Database] get err =', err);
+            if (err) {
+                return Log.e(TAG, 'Ooops! onmessage =', err) // likely the key was not found
+            }
 
-            if (err)
-                return console.log('Ooops! onmessage =', err) // likely the key was not found
-
-            console.log('[Blockchain] verifying tx =', key);
+            Log.v(TAG, 'Verifying tx =', key);
 
             res.read(key);
         });
@@ -100,7 +106,7 @@ var onquery = function(req, res) {
     var tx = req.tx;
     var block = req.block;
 
-    console.log('[Blockchain] verified tx =', tx);
+    Log.v(TAG, 'Verified tx =', tx);
 
     if (!block) return;
 
@@ -110,8 +116,17 @@ var onquery = function(req, res) {
                         .digest('hex');
 
     db.get(hash, function (err, value) {
-        if (err)
-            return console.log('Ooops! onmessage =', err) // likely the key was not found
+        if (err) {
+            return Log.e(TAG, 'Ooops! onmessage =', err) // likely the key was not found
+        }
+
+    	if (!value || typeof(value) === 'undefined') {
+    	    return ;
+    	}
+
+    	if (value.length < 1) {
+    	    return;
+    	}
 
         var tx = value[0].tx;
 
@@ -120,7 +135,7 @@ var onquery = function(req, res) {
             port: req.node.port
         };
 
-        console.log('[Blockchain]', tx, 'is found at Block#' + block.no);
+        Log.v(TAG, 'Transactions #' + key + ' found at Block#' + block.no);
         res.send(tx);
     });
 };

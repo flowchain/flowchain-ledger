@@ -28,7 +28,9 @@
 
 'use strict';
 
-var Debug = require('./debug');
+
+var Log = require('../utils/Log');
+var TAG = 'P2P/Debug';
 
 /**
  * Chord Node Class
@@ -249,8 +251,7 @@ Server.prototype.onData = function(payload) {
  * Web of things framework event handlers
  */
 Server.prototype.onNewThing = function(thing) {
-  if (Debug.Verbose)
-    console.info('onNewThing:', thing);
+  console.debug(TAG, 'onNewThing: ' + thing);
 
   // Invoke framework API to register new thing
   this.registerThing(thing);
@@ -296,10 +297,10 @@ Server.prototype.start = function(options) {
 
   this.server = server;
 
-  console.log('----- Genesis Block -----');
-  console.log( JSON.stringify(block) );
+  console.debug('----- Genesis Block -----');
+  console.debug( JSON.stringify(block) );
 
-  console.log('----- Start mining -----');
+  console.debug('----- Start mining -----');
   var miner = this.miner;
 
   miner.setTransactions([this.node]);
@@ -318,13 +319,12 @@ Server.prototype.start = function(options) {
 
           miner.setPreviousBlock(block);
 
-          console.log('Difficulty: ' + block.difficulty)
-          console.log('Block #' + block.no + ': ' + block.hash);
+          console.debug('Difficulty: ' + block.difficulty)
+          console.debug('Block #' + block.no + ': ' + block.hash);
       } else {
           var block = miner.getMiningBlock();
-          //console.log('current difficulty = ' + block.difficulty)
       }
-  }, 50);
+  }, 1000);
 
   // Event callbacks
   if (typeof this._options.onstart === 'function') {
@@ -398,8 +398,9 @@ Server.prototype.sendChordMessage = function(to, packet) {
   // Connection cache
   var connection = connections[host] || null;
 
-  if (ChordUtils.DebugServer)
-    console.info('send to ' + uri);
+  if (ChordUtils.DebugServer) {
+    console.debug('send to ' + uri);
+  }
 
   if (connection) {
     if (connection.connected) {

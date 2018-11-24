@@ -28,6 +28,10 @@
 
 'use strict';
 
+
+var Log = require('../../utils/Log');
+var TAG = 'P2P';
+
 var Utils = {
 	DebugVerbose: false,
 

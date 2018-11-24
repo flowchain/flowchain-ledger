@@ -28,6 +28,9 @@
 
 'use strict';
 
+var Log = require('../../utils/Log');
+var TAG = 'P2P/Chord';
+
 var ChordUtils = require('./utils');
 require('console.table');
 
@@ -67,8 +70,8 @@ function Node(id, server) {
     this.predecessor_ttl = this.ttl;
     this.successor_ttl = this.ttl;
 
-    console.info('node id = '+ this.id);
-    console.info('successor = ' + JSON.stringify(this.successor));
+    console.debug(TAG, 'node id = '+ this.id);
+    console.debug(TAG, 'successor = ' + JSON.stringify(this.successor));
 
     this._startUpdateFingers();
 };
@@ -89,8 +92,8 @@ Node.prototype._startUpdateFingers = function() {
         this.next_finger = next + 1;
 
         if (ChordUtils.DebugFixFingers) {
-            console.info('getFixFingerId = ' + fixFingerId);
-            console.info('finger table length = '+ this.fingers.length);
+            console.info(TAG, 'getFixFingerId = ' + fixFingerId);
+            console.info(TAG, 'finger table length = '+ this.fingers.length);
         }
 
         // n.fix_fingers()
@@ -113,10 +116,8 @@ Node.prototype._startUpdateFingers = function() {
             }
             console.table(dataset);
 
-            console.log('----------------------');
-            console.log('successor: ' + JSON.stringify(this.successor));
-            console.log('predecessor: ' + JSON.stringify(this.predecessor));
-            console.log('----------------------');
+            console.debug(TAG, 'successor: ' + JSON.stringify(this.successor));
+            console.debug(TAG, 'predecessor: ' + JSON.stringify(this.predecessor));
 
             // send to debug server
             this.send({
@@ -134,12 +135,12 @@ Node.prototype._startUpdateFingers = function() {
     // Stabilize
     this._stabilize = setInterval(function stabilize() {
         this.send(this.successor, { type: Chord.NOTIFY_STABILIZE });
-    }.bind(this), 2500);
+    }.bind(this), 3000);
 
     // Failure check
     this._check_predecessor = setInterval(function check_predecessor() {
         if (ChordUtils.DebugFailureCheck) {
-            console.log('predecessor_ttl =', this.predecessor_ttl);
+            console.info(TAG, 'predecessor_ttl =', this.predecessor_ttl);
         }
 
         // check predecessor
@@ -151,12 +152,12 @@ Node.prototype._startUpdateFingers = function() {
         // checks whether predecessor has failed
         if (this.predecessor !== null)
             this.send(this.predecessor, { type: Chord.CHECK_PREDECESSOR, predecessor_ttl: this.predecessor_ttl });
-    }.bind(this), 1500);
+    }.bind(this), 5000);
 
     // Failure check
     this._check_successor = setInterval(function check_successor() {
         if (ChordUtils.DebugFailureCheck) {
-            console.log('successor_ttl =', this.successor_ttl);
+            console.info(TAG, 'successor_ttl = ' + this.successor_ttl);
         }
 
         // check successor
@@ -255,7 +256,7 @@ Node.prototype.join = function(remote) {
     this.predecessor = null;
 
     if (ChordUtils.DebugNodeJoin)
-        console.info('try to join ' + JSON.stringify(remote));
+        console.info(TAG, 'try to join ' + JSON.stringify(remote));
 
     // Join
     this.send(remote, message);
@@ -302,7 +303,7 @@ Node.prototype.dispatch = function(_from, _message) {
              *    successor.notify(n);
              */
             if (ChordUtils.DebugStabilize)
-                console.log('NOTIFY_STABILIZE: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
+                console.info(TAG, 'NOTIFY_STABILIZE: from = ' + from.id + ', this = ' + this.id + ', this.successor = ' + this.successor.id);
 
             // N might be our predecessor
             if (this.predecessor === null) {
@@ -322,13 +323,13 @@ Node.prototype.dispatch = function(_from, _message) {
 
         case Chord.NOTIFY_PREDECESSOR:
             if (ChordUtils.DebugStabilize)
-                console.log('NOTIFY_PREDECESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
+                console.info(TAG, 'NOTIFY_PREDECESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
 
             if (ChordUtils.isInRange(from.id, this.id, this.successor.id)) {
                 this.successor = from;
 
                 if (ChordUtils.DebugStabilize)
-                    console.info('NOTIFY_PREDECESSOR: new successor is now = ' + this.successor.id);
+                    console.info(TAG, 'NOTIFY_PREDECESSOR: new successor is now = ' + this.successor.id);
             }
 
             message.type = Chord.NOTIFY_SUCCESSOR;
@@ -339,7 +340,7 @@ Node.prototype.dispatch = function(_from, _message) {
 
         case Chord.NOTIFY_SUCCESSOR:
             if (ChordUtils.DebugStabilize)
-                console.log('NOTIFY_SUCCESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
+                console.info(TAG, 'NOTIFY_SUCCESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id);
 
             /* n.notify(n')
              *  if (predecessor is nil or n'∈(predecessor, n))
@@ -350,7 +351,7 @@ Node.prototype.dispatch = function(_from, _message) {
                 this.predecessor = from;
 
                 if (ChordUtils.DebugStabilize)
-                    console.info('NOTIFY_SUCCESSOR: new predecessor is now = ' + this.predecessor.id);
+                    console.info(TAG, 'NOTIFY_SUCCESSOR: new predecessor is now = ' + this.predecessor.id);
             }
 
             break;
@@ -364,12 +365,12 @@ Node.prototype.dispatch = function(_from, _message) {
                 };
 
                 if (ChordUtils.DebugSuccessor)
-                    console.info('FOUND_SUCCESSOR = finger table fixed');
+                    console.info(TAG, 'FOUND_SUCCESSOR = finger table fixed');
 
             // find successor(key)
             } else if (message.hasOwnProperty('data')) {
                 if (ChordUtils.DebugSuccessor)
-                    console.info('found successor(key) = ' + message.id);
+                    console.info(TAG, 'found successor(key) = ' + message.id);
 
                 message.type = Chord.MESSAGE;
                 this.send(this, message, from);
@@ -379,24 +380,24 @@ Node.prototype.dispatch = function(_from, _message) {
                 this.successor = from;
 
                 if (ChordUtils.DebugSuccessor)
-                    console.info('new successor is now = ' + this.successor.id);
+                    console.info(TAG, 'new successor is now = ' + this.successor.id);
             }
 
             break;
 
         case Chord.NOTIFY_JOIN:
             if (ChordUtils.DebugNodeJoin)
-                console.info('Node joined: ' + JSON.stringify(from));
+                console.info(TAG, 'Node joined: ' + JSON.stringify(from));
 
         case Chord.FIND_SUCCESSOR:
             if (ChordUtils.DebugNodeJoin || ChordUtils.DebugSuccessor)
-                console.log('FIND_SUCCESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id, ', message.id =', message.id);
+                console.info(TAG, 'FIND_SUCCESSOR: from =', from.id, ', this =', this.id, ', this.successor =', this.successor.id, ', message.id =', message.id);
 
             // Yes, that should be a closing square bracket to match the opening parenthesis.
             // It is a half closed interval.
             if (ChordUtils.isInHalfRange(message.id, this.id, this.successor.id)) {
                 if (ChordUtils.DebugSuccessor)
-                    console.info('FIND_SUCCESSOR = ' + this.successor.id);
+                    console.info(TAG, 'FIND_SUCCESSOR = ' + this.successor.id);
 
                 message.type = Chord.FOUND_SUCCESSOR;
                 this.send(this.successor, message, from);
@@ -406,7 +407,7 @@ Node.prototype.dispatch = function(_from, _message) {
                 var n0 = this.closet_finger_preceding(message.id);
 
                 if (ChordUtils.DebugSuccessor)
-                    console.info('FIND_SUCCESSOR = closet_finger_preceding = ' + n0.id);
+                    console.info(TAG, 'FIND_SUCCESSOR = closet_finger_preceding = ' + n0.id);
 
                 message.type = Chord.FOUND_SUCCESSOR;
                 this.send(n0, message, from);
@@ -416,7 +417,7 @@ Node.prototype.dispatch = function(_from, _message) {
                 var n0 = this.closet_finger_preceding(message.id);
 
                 if (ChordUtils.DebugSuccessor)
-                    console.log('Forward to =', from.id, ', this =', this.id, ', this.successor =', this.successor.id, ', message.id =', message.id, ', n0 =' + n0.id);
+                    console.info(TAG, 'Forward to =', from.id, ', this =', this.id, ', this.successor =', this.successor.id, ', message.id =', message.id, ', n0 =' + n0.id);
 
                 message.id = n0.id;
                 this.send(n0, message, from);
@@ -456,12 +457,12 @@ Node.prototype.dispatch = function(_from, _message) {
         // find successor(key)
         case Chord.MESSAGE:
             if (ChordUtils.DebugMessage)
-                console.log('Message from', from,' =', message);
+                console.info(TAG, 'Message from', from,' =', message);
 
             break;
 
         default:
-            console.error('Unknown Chord message: ' + message.type);
+            Log.i(TAG, 'Unknown Chord message = ' + message.type);
             break;
     };
 };

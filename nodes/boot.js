@@ -1,3 +1,7 @@
+var Log = require('../utils/Log');
+var TAG = 'Flowchain-ledger';
+var TAG_DB = 'Picodb';
+
 // Import the Flowchain library
 var Flowchain = require('../libs');
 
@@ -38,7 +42,7 @@ var onmessage = function(req, res) {
 
     // Get a block
     if (!block) {
-        console.log('[Blockchain] no usable block now, data is ignored.');
+        Log.i(TAG, '[Blockchain] no usable block now, data is ignored.');
         return;
     }
 
@@ -66,19 +70,28 @@ var onmessage = function(req, res) {
 
     db.put(hash, tx, function (err) {
         if (err)
-            return console.log('Ooops! onmessage =', err) // some kind of I/O error
+            return Log.e(TAG, 'Ooops! onmessage =', err) // some kind of I/O error
 
-        console.log('[Blockchain]', tx, 'is in Block#' + block.no, ', its data key =', key);        
+        Log.i(TAG, 'Transaction #' + key + ' found in Block#' + block.no);
+
+        // send our virtual blocks (the local blockchains) to hybrid node
+        // for consensus and verfication
+        Miner.submitVirtualBlocks({
+            height: block.no,
+            merkleRoot: key,
+            miner: {
+                id: req.node.id,
+                // add lambda and puzzle solutions
+            }
+        });
 
         // fetch by key
         db.get(hash, function (err, value) {
-        console.log('[Database] get err =', err);
+            if (err) {
+                return Log.e(TAG_DB, 'Ooops! onmessage =', err) // likely the key was not found
+            }
 
-            if (err)
-                return console.log('Ooops! onmessage =', err) // likely the key was not found
-
-            console.log('[Blockchain] verifying tx =', key);
-
+            Log.i(TAG_DB, 'Verifying tx =', key);
             res.read(key);
         });
       
@@ -97,7 +110,7 @@ var onquery = function(req, res) {
     var tx = req.tx;
     var block = req.block;
 
-    console.log('[Blockchain] verified tx =', tx);
+    Log.i(TAG, 'verified tx =', tx.key);
 
     if (!block) return;
 
@@ -108,7 +121,15 @@ var onquery = function(req, res) {
 
     db.get(hash, function (err, value) {
         if (err)
-            return console.log('Ooops! onmessage =', err) // likely the key was not found
+            return Log.e(TAG, 'Ooops! onmessage =', err) // likely the key was not found
+
+	if (!value || typeof value !== 'object') {
+	    return;
+	}
+
+	if (value.length < 1) {
+	    return;
+	}
 
         var tx = value[0].tx;
 
@@ -117,7 +138,7 @@ var onquery = function(req, res) {
             port: req.node.port
         };
 
-        console.log('[Blockchain]', tx, 'is found at Block#' + block.no);
+        Log.v(TAG, 'Transaction #' + tx + ' found at Block#' + block.no);
         res.send(tx);
     });
 };
@@ -146,8 +167,9 @@ BootNode.prototype.start = function(options) {
     });
 };
 
-if (typeof(module) != "undefined" && typeof(exports) != "undefined")
+if (typeof(module) != "undefined" && typeof(exports) != "undefined") {
     module.exports = BootNode;
+}
 
 // Start the server
 if (!module.parent) {
@@ -155,7 +177,11 @@ if (!module.parent) {
         onstart: onstart,
         onmessage: onmessage,
         onquery: onquery,
-        ondata: ondata
+        ondata: ondata,
+        join: {
+            address: process.env['PEER_ADDR'] || 'localhost',
+            port: process.env['PEER_PORT'] || '8000'
+        }        
     });
 
     Miner.start({
