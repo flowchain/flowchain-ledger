@@ -4,11 +4,15 @@
 
 Flowchain-ledger is a distributed ledger technology (DLT) for the Internet of Things (IoT) devices (aka. IoT Blockchain). The Flowchain software framework is designed from the ground up to fit current IoT needs.
 
-# Introduction
+# About Flowchain
 
 Flowchain is a software framework for the IoT blockchain to provide a distributed ledger programming framework for peer-to-peer IoT networks and real-time data transactions, and ```flowchain-ledger``` is the Node.js distribution for heterogeneous hardware devices, such as MediaTek LinkIt Smart 7688, Raspberry Pi, laptops, smart phones and etc.
 
-This is a beta release, and it's now ready to be evaluated.
+# Abstract
+
+Flowchain aims to implement a blockchain that can provide near real-time transactions for the IoT. The Flowchain technology can ensure chunked data (data streams) transactions by using the *virtual blocks* concept which is proposed by Flowchain acamedic papers. The virtual blocks can be combined with emerging public blockchains, such as Ethereum and Hyperledger which is optimized specifically for the use case of off-chain transactions.
+
+The FlowchainCoin (symbol: FLC) is the Ethereum ERC20 token for tokenized assets that use in the Flowchain network. Tokens offer can support the transfer of assets from one trusted party to another.
 
 # Features
 
@@ -18,8 +22,10 @@ This is a beta release, and it's now ready to be evaluated.
 * Distributed Hash Table (DHT) by the Chord protocol
 * The device server in Web of Things (WoT) architecture
 
-## Documentation
+# SDK
 * [See Flowchain Documentation](https://github.com/flowchain/flowchain-ledger/wiki)
+
+# Publication
 
 ## Presentation
 
@@ -34,7 +40,7 @@ This work is based on the research papers.
 
 [2] Chen, J. (2017). [Devify: Decentralized Internet of Things Software Framework for a Peer-to-Peer and Interoperable IoT Device](https://sites.google.com/view/aiotas2017/program?authuser=0) In: Advances in IoT Architecture and Systems. Toronto, Canada.
 
-### How to Cite
+## How to Cite
 
 ```
 @article{flowchain_2017,
@@ -52,6 +58,6 @@ year={2017}
 },
 ```
 
-## License
+# License
 
 Copyright (C) 2016-present Jollen. The source code is licensed under the MIT license found in the [LICENSE](LICENSE) file.
