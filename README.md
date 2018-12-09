@@ -22,7 +22,9 @@ The FlowchainCoin (symbol: FLC) is the Ethereum ERC20 token for tokenized assets
 * Distributed Hash Table (DHT) by the Chord protocol
 * The device server in Web of Things (WoT) architecture
 
-# SDK
+# SDK and Prerequisite
+
+* Node.js v8+
 * [See Flowchain Documentation](https://github.com/flowchain/flowchain-ledger/wiki)
 
 # Publication

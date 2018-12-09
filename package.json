@@ -27,6 +27,6 @@
   "devDependencies": {},
   "author": "jollen",
   "engines": {
-    "node": "4.4"
+    "node": "8.14"
   }
 }
