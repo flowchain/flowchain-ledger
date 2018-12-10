@@ -22,10 +22,23 @@ The FlowchainCoin (symbol: FLC) is the Ethereum ERC20 token for tokenized assets
 * Distributed Hash Table (DHT) by the Chord protocol
 * The device server in Web of Things (WoT) architecture
 
-# SDK and Prerequisite
+# How to Use
+
+Use `flowchain-ledger` to submit transactions.
+
+```
+var PeerNode = require('flowchain-ledger').PeerNode;
+var node = new PeerNode();;
+node.submit(data);
+```
+
+The [flowchain-hybrid](https://github.com/flowchain/flowchain-hybrid) is the blockchain application built on flowchain-ledger.
+
+## SDK and Prerequisite
 
 * Node.js v8+
 * [See Flowchain Documentation](https://github.com/flowchain/flowchain-ledger/wiki)
+
 
 # Publication
 
