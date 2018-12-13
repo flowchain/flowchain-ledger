@@ -28,9 +28,14 @@
 
 'use strict';
 
-
+var bigInt = require("big-integer");
 var Log = require('../../utils/Log');
 var TAG = 'P2P';
+
+var hexToBigInt = function(hex) {
+    var v = bigInt(hex.replace('0x', ''), 16);
+    return v;
+};
 
 var Utils = {
 	DebugVerbose: false,
@@ -93,10 +98,17 @@ var Utils = {
 		if (Utils.DebugSuccessor)
 			console.info(key + ' isInHalfRange [ ' + n + ', ' + successor + ']')
 
-		if (n < successor) {
-			return (key > n && key <= successor) || (n === successor && key < n);
+		var bKey = hexToBigInt(key);
+		var bN = hexToBigInt(n);
+		var bSuccessor = hexToBigInt(successor);
+
+		// n < successor
+		if (bN.compare(bSuccessor) <= -1) {
+			// (key > n && key <= successor) || (n === successor && key < n)
+			return (bKey.compare(bN) >= 1 && bKey.compare(bSuccessor) <= 0) || (bN.compare(bSuccessor) === 0 && bKey.compare(bN) <= -1);
 		} else {
-			return (key > successor && key <= n) || (n === successor && key < n);
+			// (key > successor && key <= n) || (n === successor && key < n)
+			return (bKey.compare(bSuccessor) >= 1 && bKey.compare(bN) <= 0) || (bN.compare(bSuccessor) === 0 && bKey.compare(bN) <= -1);
 		}
 	},
 
@@ -113,10 +125,17 @@ var Utils = {
 		if (Utils.DebugFixFingers || Utils.DebugStabilize)
 			console.info(key + ' isInRange [ ' + left + ', ' + right + ']')
 
-		if (left < right) {
-			return (key > left && key < right) || (left === right && key !== left);
+		var bKey = hexToBigInt(key);
+		var bLeft = hexToBigInt(left);
+		var bRight = hexToBigInt(right);
+
+		// left < right
+		if (bLeft.compare(bRight) <= -1) {
+			// (key > left && key < right) || (left === right && key !== left)
+			return (bKey.compare(bLeft) >= 1 && bKey.compare(bRight) <= -1) || (bLeft.compare(bRight) === 0 && bKey.compare(bLeft) !== 0);
 		} else {
-			return (key > right && key < left) || (left === right && key !== left);
+			// (key > right && key < left) || (left === right && key !== left)
+			return (bKey.compare(bRight) >= 1 && bKey.compare(bLeft) <= -1) || (bLeft.compare(bRight) === 0 && bKey.compare(bLeft) !== 0);
 		}
 	},
 
