@@ -135,7 +135,7 @@ Node.prototype._startUpdateFingers = function() {
     // Stabilize
     this._stabilize = setInterval(function stabilize() {
         this.send(this.successor, { type: Chord.NOTIFY_STABILIZE });
-    }.bind(this), 3000);
+    }.bind(this), 60000);
 
     // Failure check
     this._check_predecessor = setInterval(function check_predecessor() {
@@ -152,7 +152,7 @@ Node.prototype._startUpdateFingers = function() {
         // checks whether predecessor has failed
         if (this.predecessor !== null)
             this.send(this.predecessor, { type: Chord.CHECK_PREDECESSOR, predecessor_ttl: this.predecessor_ttl });
-    }.bind(this), 5000);
+    }.bind(this), 30000);
 
     // Failure check
     this._check_successor = setInterval(function check_successor() {
@@ -167,9 +167,9 @@ Node.prototype._startUpdateFingers = function() {
         }
 
         this.send(this.successor, { type: Chord.CHECK_SUCESSOR, successor_ttl: this.successor_ttl });
-    }.bind(this), 3500);
+    }.bind(this), 30000);
 
-    this._fix_fingers = setInterval(fix_fingers.bind(this), 5000);
+    this._fix_fingers = setInterval(fix_fingers.bind(this), 15000);
 }
 
 Node.prototype.clearIntervals = function() {
