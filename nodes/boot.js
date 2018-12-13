@@ -1,5 +1,5 @@
 var Log = require('../utils/Log');
-var TAG = 'Flowchain-ledger';
+var TAG = 'Flowchain/Ledger';
 var TAG_DB = 'Picodb';
 
 // Import the Flowchain library
@@ -42,7 +42,7 @@ var onmessage = function(req, res) {
 
     // Get a block
     if (!block) {
-        Log.i(TAG, '[Blockchain] no usable block now, data is ignored.');
+        Log.i(TAG, 'No blocks now, ignore data.');
         return;
     }
 
@@ -69,10 +69,11 @@ var onmessage = function(req, res) {
     }
 
     db.put(hash, tx, function (err) {
-        if (err)
+        if (err) {
             return Log.e(TAG, 'Ooops! onmessage =', err) // some kind of I/O error
+        }
 
-        Log.i(TAG, 'Transaction #' + key + ' found in Block#' + block.no);
+        Log.v(TAG, 'Transactions #' + key + 'found in Block#' + block.no);
 
         // send our virtual blocks (the local blockchains) to hybrid node
         // for consensus and verfication
@@ -88,14 +89,16 @@ var onmessage = function(req, res) {
         // fetch by key
         db.get(hash, function (err, value) {
             if (err) {
-                return Log.e(TAG_DB, 'Ooops! onmessage =', err) // likely the key was not found
+                return Log.e(TAG, 'Ooops! onmessage =', err) // likely the key was not found
             }
 
-            Log.i(TAG_DB, 'Verifying tx =', key);
+            Log.v(TAG, 'Verifying tx =', key);
+
             res.read(key);
         });
       
     });
+
 };
 
 // Application event callbacks
@@ -158,6 +161,17 @@ function BootNode() {
     this.server = server;
 }
 
+/**
+ * Submit a transaction to the Flowchain p2p network
+ *
+ * @param {Object} data
+ * @return {Object}
+ * @api public
+ */
+BootNode.prototype.submit = function(data) {
+    this.server.save(data);
+}
+
 BootNode.prototype.start = function(options) {
     this.server.start({
         onstart: onstart,
@@ -177,16 +191,6 @@ if (!module.parent) {
         onstart: onstart,
         onmessage: onmessage,
         onquery: onquery,
-        ondata: ondata,
-        join: {
-            address: process.env['PEER_ADDR'] || 'localhost',
-            port: process.env['PEER_PORT'] || '8000'
-        }        
-    });
-
-    Miner.start({
-        host: 'testnet.pool.flowchain.io',
-        port: 3333,
-        worker: 'flowchain-hybrid'
-    });
+        ondata: ondata,       
+    });  
 }

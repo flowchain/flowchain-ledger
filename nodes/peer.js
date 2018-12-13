@@ -1,10 +1,14 @@
-
-// The Flowchain log system
 var Log = require('../utils/Log');
-var TAG = 'Blockchain';
+var TAG = 'Flowchain/Ledger';
+var TAG_DB = 'Picodb';
 
 // Import the Flowchain library
 var Flowchain = require('../libs');
+
+/**
+ * IPFS Client
+ */
+var IpfsApi = require('ipfs-api');
 
 // Import Websocket server
 var server = Flowchain.WoTServer;
@@ -15,6 +19,16 @@ var crypto = Flowchain.Crypto;
 // Database
 var Database = Flowchain.DatabaseAdapter;
 var db = new Database('picodb');
+
+// Create an IPFS client instance
+var ipfs = IpfsApi({
+  host: 'localhost',
+  port: 5001,
+  protocol: 'http',
+  headers: {
+    authorization: 'FLC ' //+ TOKEN
+  }
+});
 
 /**
  * The Application Layer
@@ -68,6 +82,7 @@ var onmessage = function(req, res) {
         key: key,
         status: 'ACK'
     };
+
     if (node.address !== from.address ||
         node.port !== from.port) {
         node.send(from, ack);
@@ -79,6 +94,21 @@ var onmessage = function(req, res) {
         }
 
         Log.v(TAG, 'Transactions #' + key + 'found in Block#' + block.no);
+
+
+        // Get the IPFS hash (filename)
+        var ipfsVideoHash = ipfs.add(data
+            , function(err, res) {
+              if (err) {
+                Log.i(TAG_IPFS, 'Error: ' + err);
+                return;
+              }
+              var hash = res[0].hash;
+              var size = res[0].size;
+
+              Log.i(TAG_IPFS, 'IPFS hash: ' + hash + '. Size: ' + size);          
+            }
+        );
 
         // fetch by key
         db.get(hash, function (err, value) {
@@ -192,11 +222,12 @@ PeerNode.prototype.start = function(options) {
     });
 };
 
-if (typeof(module) != "undefined" && typeof(exports) != "undefined")
+if (typeof(module) != "undefined" && typeof(exports) != "undefined") {
     module.exports = PeerNode;
+}
 
 // Start the server
-if (!module.parent)
+if (!module.parent) {
     server.start({
         onstart: onstart,
         onmessage: onmessage,
@@ -207,3 +238,4 @@ if (!module.parent)
             port: process.env['PEER_PORT'] || '8000'
         }
     });
+}
