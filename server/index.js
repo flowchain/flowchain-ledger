@@ -290,6 +290,7 @@ Server.prototype.start = function(options) {
 
   // Connect to a subsequent Chord node
   if (typeof options.join === 'object') {
+    // Join the p2p network
     this.node.join(options.join);
   }
 
@@ -300,7 +301,7 @@ Server.prototype.start = function(options) {
   console.debug('----- Genesis Block -----');
   console.debug( JSON.stringify(block) );
 
-  console.debug('----- Start mining -----');
+  console.debug('----- Start virtual block mining -----');
   var miner = this.miner;
 
   miner.setTransactions([this.node]);

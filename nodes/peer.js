@@ -1,14 +1,13 @@
 var Log = require('../utils/Log');
 var TAG = 'Flowchain/Ledger';
 var TAG_DB = 'Picodb';
+var TAG_QUERY = 'Flowchain/Ledger/Query';
+
+// Chord protocols
+var Chord = require('../p2p/libs/message');
 
 // Import the Flowchain library
 var Flowchain = require('../libs');
-
-/**
- * IPFS Client
- */
-var IpfsApi = require('ipfs-api');
 
 // Import Websocket server
 var server = Flowchain.WoTServer;
@@ -19,16 +18,6 @@ var crypto = Flowchain.Crypto;
 // Database
 var Database = Flowchain.DatabaseAdapter;
 var db = new Database('picodb');
-
-// Create an IPFS client instance
-var ipfs = IpfsApi({
-  host: 'localhost',
-  port: 5001,
-  protocol: 'http',
-  headers: {
-    authorization: 'FLC ' //+ TOKEN
-  }
-});
 
 /**
  * The Application Layer
@@ -51,7 +40,7 @@ var onmessage = function(req, res) {
 
     // Get a block
     if (!block) {
-        Log.i(TAG, 'No blocks now, ignore data.');
+        Log.i(TAG, 'No virtual blocks now, ignore #' + key);
         return;
     }
 
@@ -78,6 +67,7 @@ var onmessage = function(req, res) {
     };
 
     // Send ACK back
+    /*
     var ack = {
         key: key,
         status: 'ACK'
@@ -87,28 +77,14 @@ var onmessage = function(req, res) {
         node.port !== from.port) {
         node.send(from, ack);
     }
+    */
 
     db.put(hash, tx, function (err) {
         if (err) {
             return Log.e(TAG, 'Ooops! onmessage =', err) // some kind of I/O error
         }
 
-        Log.v(TAG, 'Transactions #' + key + 'found in Block#' + block.no);
-
-
-        // Get the IPFS hash (filename)
-        var ipfsVideoHash = ipfs.add(data
-            , function(err, res) {
-              if (err) {
-                Log.i(TAG_IPFS, 'Error: ' + err);
-                return;
-              }
-              var hash = res[0].hash;
-              var size = res[0].size;
-
-              Log.i(TAG_IPFS, 'IPFS hash: ' + hash + '. Size: ' + size);          
-            }
-        );
+        Log.v(TAG, 'Transactions #' + key + ' found in Block#' + block.no);
 
         // fetch by key
         db.get(hash, function (err, value) {
@@ -131,12 +107,23 @@ var onstart = function(req, res) {
     var address = req.node.address;
 };
 
-// Application event callbacks
+/**
+ * Query data in the local blocks.
+ *
+ * Response:
+ *
+ *   { origin:
+ *       { 
+ *           address: '192.168.0.105',
+ *           port: 8000,
+ *           id: '4b0618b5030220ef616c0b9ee92b2936d695c4e0' 
+ *       },
+ *     key: 'ce6b87119dc5e92040172eb6045828acb569bacc' 
+ *   } 
+ */
 var onquery = function(req, res) {
     var tx = req.tx;
     var block = req.block;
-
-    Log.v(TAG, 'Verified tx =', tx);
 
     if (!block) return;
 
@@ -158,15 +145,23 @@ var onquery = function(req, res) {
     	    return;
     	}
 
-        var tx = value[0].tx;
+        /*
+         * The raw data in the local database:
+         *
+         *   { temperature: 23,
+         *     source: { 
+         *       address: '192.168.0.105', port: 8000 
+         *     } 
+         *   }
+         */
+        var payload = value[0].tx;
 
-        tx.source = {
+        payload.source = {
             address: req.node.address,
             port: req.node.port
         };
 
-        Log.v(TAG, 'Transactions #' + key + ' found at Block#' + block.no);
-        res.send(tx);
+        Log.v(TAG_QUERY, 'Verified #' + tx.key);
     });
 };
 

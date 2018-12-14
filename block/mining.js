@@ -91,9 +91,9 @@ Miner.prototype.generateHash = function() {
                         .update('powered by flowchain')
                         .digest('hex');
 
-    // Fix difficulty
+    // Fix mining difficulty
     this.jiffies = os.uptime() - this.startUptime;
-    this._fixDifficultyNormal();
+    this._fixDifficultyConsensus();
 
     this.newBlock.nonce++;
     this._success = ( this.newBlock.hash < this.newBlock.difficulty );
@@ -132,8 +132,14 @@ Miner.prototype.getNonce = function() {
     return this.newBlock.nonce;
 };
 
+// TODO: fix mining difficulty by network consensus
+Miner.prototype._fixDifficultyConsensus = function() {
+    var key = this.previousBlock.difficulty;
+    
+    this.newBlock.difficulty = key;
+};
 
-// The simplest difficulty
+// Fix mining difficulty in the Satoshi method.
 Miner.prototype._fixDifficultyNormal = function() {
     var key = this.previousBlock.difficulty;
     var index = key.length;
@@ -142,7 +148,7 @@ Miner.prototype._fixDifficultyNormal = function() {
     this.newBlock.difficulty = key;
 };
 
-// Sifficulty by normal distribution (system uptime)
+// Fix mining difficulty by normal distribution (system uptime)
 Miner.prototype._fixDifficulty = function() {
     var Difficulty = require('./difficulty');
 

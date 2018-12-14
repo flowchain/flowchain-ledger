@@ -60,6 +60,11 @@ function Node(id, server) {
     this.predecessor = null;
     this.successor = this._self;
 
+    this.hybrid = {
+        address: '127.0.0.1',
+        port: '8000'
+    };
+
     // Initialize finger table
     this.fingers = [];
     this.fingers.length = 0;
@@ -386,7 +391,6 @@ Node.prototype.dispatch = function(_from, _message) {
             break;
 
         case Chord.NOTIFY_JOIN:
-            if (ChordUtils.DebugNodeJoin)
                 console.info(TAG, 'Node joined: ' + JSON.stringify(from));
 
         case Chord.FIND_SUCCESSOR:

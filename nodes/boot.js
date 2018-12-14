@@ -5,9 +5,6 @@ var TAG_DB = 'Picodb';
 // Import the Flowchain library
 var Flowchain = require('../libs');
 
-// The flowchain hybrid node is also the miner of digital assets
-var Miner = require('flowchain-hybrid').Miner;
-
 // Import Websocket server
 var server = Flowchain.WoTServer;
 
@@ -27,6 +24,8 @@ var db = new Database('picodb');
  * I am the successor node of the data.
  */
 var onmessage = function(req, res) {
+    var submitVirtualBlocks = res.submit;
+
     var payload = req.payload;
     var block = req.block;
     var node = req.node;
@@ -74,17 +73,6 @@ var onmessage = function(req, res) {
         }
 
         Log.v(TAG, 'Transactions #' + key + 'found in Block#' + block.no);
-
-        // send our virtual blocks (the local blockchains) to hybrid node
-        // for consensus and verfication
-        Miner.submitVirtualBlocks({
-            height: block.no,
-            merkleRoot: key,
-            miner: {
-                id: req.node.id,
-                // add lambda and puzzle solutions
-            }
-        });
 
         // fetch by key
         db.get(hash, function (err, value) {
@@ -191,6 +179,10 @@ if (!module.parent) {
         onstart: onstart,
         onmessage: onmessage,
         onquery: onquery,
-        ondata: ondata,       
+        ondata: ondata, 
+        join: {
+            address: process.env['PEER_ADDR'] || 'localhost',
+            port: process.env['PEER_PORT'] || '8000'
+        }              
     });  
 }
