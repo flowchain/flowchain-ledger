@@ -8,11 +8,10 @@ Flowchain-ledger is a distributed ledger technology (DLT) for the Internet of Th
 
 Flowchain is a software framework for the IoT blockchain to provide a distributed ledger programming framework for peer-to-peer IoT networks and real-time data transactions, and ```flowchain-ledger``` is the Node.js distribution for heterogeneous hardware devices, such as MediaTek LinkIt Smart 7688, Raspberry Pi, laptops, smart phones and etc.
 
-If you need the "Blockchain" for the IoT network, please refer to [flowchain-hybrid](https://github.com/flowchain/flowchain-hybrid).
-
 # Abstract
 
-Flowchain aims to implement a blockchain that can provide near real-time transactions for the IoT. The Flowchain technology can ensure chunked data (data streams) transactions by using the *virtual blocks* concept which is proposed by Flowchain acamedic papers. The virtual blocks can be combined with emerging public blockchains, such as Ethereum and Hyperledger which is optimized specifically for the use case of off-chain transactions.
+Flowchain aims to implement a blockchain that can provide near real-time transactions for the IoT. The Flowchain technology can ensure chunked data (data streams) transactions by using the *virtual blocks* concept which is proposed by Flowchain acamedic papers. The virtual blocks can be combined with emerging public blockchains, such as Ethereum and Hyperledger which is optimized specifically for the use case of off-chain transactions. If you need such "Hybrid Blockchain" network for the IoT, please refer to [flowchain-hybrid](https://github.com/flowchain/flowchain-hybrid).
+
 
 The FlowchainCoin (symbol: FLC) is the Ethereum ERC20 token for tokenized assets that use in the Flowchain network. Tokens offer can support the transfer of assets from one trusted party to another.
 
