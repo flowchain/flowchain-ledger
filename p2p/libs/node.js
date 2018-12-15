@@ -61,8 +61,8 @@ function Node(id, server) {
     this.successor = this._self;
 
     this.hybrid = {
-        address: '127.0.0.1',
-        port: '8000'
+        address: process.env.EDGE_HOST || 'localhost',
+        port: process.env.EDGE_PORT || '8000'
     };
 
     // Initialize finger table
@@ -269,6 +269,21 @@ Node.prototype.join = function(remote) {
     return true;
 };
 
+Node.prototype.submitVirtualBlocks = function(virtual_blocks) {
+    var to = this.hybrid;
+    var key = ChordUtils.hash(virtual_blocks);
+
+    var message = {
+        id: key,
+        type: Chord.NOTIFY_EDGE,
+        data: virtual_blocks,
+    };
+
+    this.send(to, message);
+
+    return true;
+};
+
 /*
  * Return closet finger proceding ID
  */
@@ -457,6 +472,8 @@ Node.prototype.dispatch = function(_from, _message) {
             }
 
             break;
+
+        case Chord.NOTIFY_EDGE:
 
         // find successor(key)
         case Chord.MESSAGE:

@@ -36,12 +36,16 @@ var Chord = {
     NOTIFY_PREDECESSOR: 1,
     NOTIFY_SUCCESSOR: 2,
     NOTIFY_JOIN: 3,
-    FIND_SUCCESSOR: 4,
-    FOUND_SUCCESSOR: 5,
-    CHECK_PREDECESSOR: 6,
-    CHECK_SUCESSOR: 7,
-    CHECK_TTL: 8,
-    MESSAGE: 9
+
+    // Send messages to the hybrid node (aka. the edge node) for consensus
+    NOTIFY_EDGE: 4,
+    
+    FIND_SUCCESSOR: 5,
+    FOUND_SUCCESSOR: 6,
+    CHECK_PREDECESSOR: 7,
+    CHECK_SUCESSOR: 8,
+    CHECK_TTL: 9,
+    MESSAGE: 10
 };
 
 if (typeof(module) != "undefined" && typeof(exports) != "undefined")

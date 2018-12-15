@@ -193,6 +193,31 @@ Server.prototype.onData = function(payload) {
     tx = packet.message.data;
   }
 
+  // Send virtual blocks to the hybrid node
+  if (packet.message.type === Chord.NOTIFY_EDGE
+      && typeof this._options.onedge === 'function') 
+  {
+    var req = {
+      node: {}
+    };
+    var res = {
+      save: function() {},
+      read: function() {},
+      send: function() {}
+    };
+
+    req.node = this.node;
+    req.payload = payload;
+    req.block = this.blockchain[this.blockchain.length - 1];
+    req.tx = tx;
+
+    res.save = this.save.bind(this);
+    res.read = this.read.bind(this);
+    res.send = this.sendAsset.bind(this);
+
+    return this._options.onedge(req, res);
+  }
+
   // This message is for me to query data of my blocks
   if (typeof this._options.onquery === 'function'
         && typeof tx !== 'undefined'

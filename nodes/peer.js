@@ -20,10 +20,13 @@ var Database = Flowchain.DatabaseAdapter;
 var db = new Database('picodb');
 
 /**
- * The Application Layer
+ * The `onmessage` callback. Handling Chord messages
+ * which is assigned/forwarded to this node.
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean}
  */
-
-// Application event callbacks
 var onmessage = function(req, res) {
     var payload = req.payload;
     var block = req.block;
@@ -86,6 +89,36 @@ var onmessage = function(req, res) {
 
         Log.v(TAG, 'Transactions #' + key + ' found in Block#' + block.no);
 
+        // Submit data transactions to the p2p network.
+        // The data is sent via our virtual blocks (the local blockchains) to 
+        // hybrid node for consensus and verfication.
+        // The boot node is a hybrid node.
+        node.submitVirtualBlocks([{
+            height: block.no,
+            merkleRoot: hash,
+            miner: {
+                id: node.id,
+                // add lambda and puzzle solutions
+            }
+        }]);
+
+        Log.v(TAG, 'Submit virtual blocks #' + hash);                
+
+        // Get the IPFS hash (filename)
+        /*var ipfsVideoHash = ipfs.add(tx
+            , function(err, res) {
+              if (err) {
+                Log.i(TAG_IPFS, 'Error: ' + err);
+                return;
+              }
+              var hash = res[0].hash;
+              var size = res[0].size;
+
+              Log.i(TAG_IPFS, 'IPFS hash: ' + hash + '. Size: ' + size);  
+              Log.v(TAG, 'Transactions #' + key + ' found in Block#' + block.no);                
+            }
+        );*/
+
         // fetch by key
         db.get(hash, function (err, value) {
             if (err) {
@@ -96,11 +129,17 @@ var onmessage = function(req, res) {
 
             res.read(key);
         });
-      
     });
 };
 
-// Application event callbacks
+/**
+ * The `onstart` callback triggered when the server was successfully
+ * started.
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean}
+ */
 var onstart = function(req, res) {
     // Chord node ID
     var id = req.node.id;
@@ -108,9 +147,10 @@ var onstart = function(req, res) {
 };
 
 /**
- * Query data in the local blocks.
+ * The `onquery` callback. Handling ledger queries data in the local blocks.
+ * It should check whether the transaction was stored in the local ledgers.
  *
- * Response:
+ * req.block:
  *
  *   { origin:
  *       { 
@@ -120,6 +160,10 @@ var onstart = function(req, res) {
  *       },
  *     key: 'ce6b87119dc5e92040172eb6045828acb569bacc' 
  *   } 
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean} 
  */
 var onquery = function(req, res) {
     var tx = req.tx;
@@ -165,12 +209,29 @@ var onquery = function(req, res) {
     });
 };
 
-// Application event callbacks
+/**
+ * The `ondata` callback.
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean}
+ */
 var ondata = function(req, res) {
     var data = req.data;
     var put = res.save;
 
     put(data);
+};
+
+/**
+ * The `onedge` callback.
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean}
+ */
+var onedge = function(req, res) {
+    return;
 };
 
 function PeerNode() {
@@ -210,6 +271,7 @@ PeerNode.prototype.start = function(options) {
         onmessage: options.onmessage || onmessage,
         onquery: options.onquery || onquery,
         ondata: options.ondata || ondata,
+        onedge: options.onedge || onedge,
         join: {
             address: process.env['PEER_ADDR'] || peerAddr,
             port: process.env['PEER_PORT'] || peerPort

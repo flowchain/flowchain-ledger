@@ -1,6 +1,10 @@
 var Log = require('../utils/Log');
 var TAG = 'Flowchain/Ledger';
 var TAG_DB = 'Picodb';
+var TAG_QUERY = 'Flowchain/Ledger/Query';
+
+// Chord protocols
+var Chord = require('../p2p/libs/message');
 
 // Import the Flowchain library
 var Flowchain = require('../libs');
@@ -16,16 +20,14 @@ var Database = Flowchain.DatabaseAdapter;
 var db = new Database('picodb');
 
 /**
- * The Application Layer
- */
-
-/**
- * Application event callbacks.
- * I am the successor node of the data.
+ * The `onmessage` callback. Handling Chord messages
+ * which is assigned/forwarded to this node.
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean}
  */
 var onmessage = function(req, res) {
-    var submitVirtualBlocks = res.submit;
-
     var payload = req.payload;
     var block = req.block;
     var node = req.node;
@@ -41,7 +43,7 @@ var onmessage = function(req, res) {
 
     // Get a block
     if (!block) {
-        Log.i(TAG, 'No blocks now, ignore data.');
+        Log.i(TAG, 'No virtual blocks now, ignore #' + key);
         return;
     }
 
@@ -50,29 +52,72 @@ var onmessage = function(req, res) {
                         .update( key )
                         .digest('hex');
 
-    // Generate an asset and send it to the endpoint
+    // Generate an asset
     var asset = {
         // Data key
         key: key
     };
+
+    // Give out the asset
     //res.send(asset);
 
+    // Establish a linked data description
+    var device = {
+        '@context': [
+            'http://w3c.github.io/wot/w3c-wot-td-contxt.jsonld'
+        ],
+        'name': '',
+    };
+
     // Send ACK back
+    /*
     var ack = {
         key: key,
         status: 'ACK'
     };
+
     if (node.address !== from.address ||
         node.port !== from.port) {
         node.send(from, ack);
     }
+    */
 
     db.put(hash, tx, function (err) {
         if (err) {
             return Log.e(TAG, 'Ooops! onmessage =', err) // some kind of I/O error
         }
 
-        Log.v(TAG, 'Transactions #' + key + 'found in Block#' + block.no);
+        Log.v(TAG, 'Transactions #' + key + ' found in Block#' + block.no);
+
+        // Submit data transactions to the p2p network.
+        // The data is sent via our virtual blocks (the local blockchains) to 
+        // hybrid node for consensus and verfication.
+        // The boot node is a hybrid node.
+        node.submitVirtualBlocks([{
+            height: block.no,
+            merkleRoot: hash,
+            miner: {
+                id: node.id,
+                // add lambda and puzzle solutions
+            }
+        }]);
+
+        Log.v(TAG, 'Submit virtual blocks #' + hash);                
+
+        // Get the IPFS hash (filename)
+        /*var ipfsVideoHash = ipfs.add(tx
+            , function(err, res) {
+              if (err) {
+                Log.i(TAG_IPFS, 'Error: ' + err);
+                return;
+              }
+              var hash = res[0].hash;
+              var size = res[0].size;
+
+              Log.i(TAG_IPFS, 'IPFS hash: ' + hash + '. Size: ' + size);  
+              Log.v(TAG, 'Transactions #' + key + ' found in Block#' + block.no);                
+            }
+        );*/
 
         // fetch by key
         db.get(hash, function (err, value) {
@@ -84,24 +129,45 @@ var onmessage = function(req, res) {
 
             res.read(key);
         });
-      
     });
-
 };
 
-// Application event callbacks
+/**
+ * The `onstart` callback triggered when the server was successfully
+ * started.
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean}
+ */
 var onstart = function(req, res) {
     // Chord node ID
     var id = req.node.id;
     var address = req.node.address;
 };
 
-// Application event callbacks
+/**
+ * The `onquery` callback. Handling ledger queries data in the local blocks.
+ * It should check whether the transaction was stored in the local ledgers.
+ *
+ * req.block:
+ *
+ *   { origin:
+ *       { 
+ *           address: '192.168.0.105',
+ *           port: 8000,
+ *           id: '4b0618b5030220ef616c0b9ee92b2936d695c4e0' 
+ *       },
+ *     key: 'ce6b87119dc5e92040172eb6045828acb569bacc' 
+ *   } 
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean} 
+ */
 var onquery = function(req, res) {
     var tx = req.tx;
     var block = req.block;
-
-    Log.i(TAG, 'verified tx =', tx.key);
 
     if (!block) return;
 
@@ -111,32 +177,44 @@ var onquery = function(req, res) {
                         .digest('hex');
 
     db.get(hash, function (err, value) {
-        if (err)
+        if (err) {
             return Log.e(TAG, 'Ooops! onmessage =', err) // likely the key was not found
+        }
 
-	if (!value || typeof value !== 'object') {
-	    return;
-	}
+        if (!value || typeof(value) === 'undefined') {
+            return ;
+        }
 
-	if (value.length < 1) {
-	    return;
-	}
+        if (value.length < 1) {
+            return;
+        }
 
-        var tx = value[0].tx;
+        /*
+         * The raw data in the local database:
+         *
+         *   { temperature: 23,
+         *     source: { 
+         *       address: '192.168.0.105', port: 8000 
+         *     } 
+         *   }
+         */
+        var payload = value[0].tx;
 
-        tx.source = {
+        payload.source = {
             address: req.node.address,
             port: req.node.port
         };
 
-        Log.v(TAG, 'Transaction #' + tx + ' found at Block#' + block.no);
-        res.send(tx);
+        Log.v(TAG_QUERY, 'Verified #' + tx.key);
     });
 };
 
 /**
- * Application event callbacks.
- * Forward the data over the Chord ring.
+ * The `ondata` callback.
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean}
  */
 var ondata = function(req, res) {
     var data = req.data;
@@ -145,7 +223,18 @@ var ondata = function(req, res) {
     put(data);
 };
 
-function BootNode() {
+/**
+ * The `onedge` callback.
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {Boolean}
+ */
+var onedge = function(req, res) {
+    return;
+};
+
+function PeerNode() {
     this.server = server;
 }
 
@@ -156,21 +245,42 @@ function BootNode() {
  * @return {Object}
  * @api public
  */
-BootNode.prototype.submit = function(data) {
+PeerNode.prototype.submit = function(data) {
     this.server.save(data);
 }
 
-BootNode.prototype.start = function(options) {
+/**
+ * Create a Flowchain Ledger node
+ *
+ * @param {Object} options 
+ * @return {Object}
+ * @api public
+ */
+PeerNode.prototype.start = function(options) {
+    var peerAddr = 'localhost';
+    var peerPort = '8000';
+    if (!options) options = {};
+
+    if (options.join) {
+        peerAddr = options.join.address || peerAddr;
+        peerPort = options.join.port || peerPort;
+    }
+
     this.server.start({
-        onstart: onstart,
-        onmessage: onmessage,
-        onquery: onquery,
-        ondata: ondata
+        onstart: options.onstart || onstart,
+        onmessage: options.onmessage || onmessage,
+        onquery: options.onquery || onquery,
+        ondata: options.ondata || ondata,
+        onedge: options.onedge || onedge,
+        join: {
+            address: process.env['PEER_ADDR'] || peerAddr,
+            port: process.env['PEER_PORT'] || peerPort
+        }
     });
 };
 
 if (typeof(module) != "undefined" && typeof(exports) != "undefined") {
-    module.exports = BootNode;
+    module.exports = PeerNode;
 }
 
 // Start the server
@@ -179,10 +289,6 @@ if (!module.parent) {
         onstart: onstart,
         onmessage: onmessage,
         onquery: onquery,
-        ondata: ondata, 
-        join: {
-            address: process.env['PEER_ADDR'] || 'localhost',
-            port: process.env['PEER_PORT'] || '8000'
-        }              
-    });  
+        ondata: ondata
+    });
 }
