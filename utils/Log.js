@@ -3,7 +3,7 @@ var chalk = require('chalk');
 var fs = require('fs');
 var util = require('util');
 
-var config = JSON.parse( fs.readFileSync('./package.json') );
+var config = JSON.parse( fs.readFileSync(__dirname + '/../package.json') );
 
 /**
  * Log utils
