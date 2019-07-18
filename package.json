@@ -7,6 +7,7 @@
     "chalk": "^2.4.1",
     "codecov": "^3.1.0",
     "console.table": "^0.8.0",
+    "diff": "^4.0.1",
     "flowchain-hybrid": "*",
     "gaussian": "^1.1.0",
     "ipfs-api": "^26.1.2",
