@@ -1,8 +1,15 @@
+# flowchain-ledger
+> Flowchain distributed ledgers in JavaScript
+
 ![](https://flowchain.co/static/logo-text@128.png)
 
 [![Build Status](https://travis-ci.org/flowchain/flowchain-ledger.svg?branch=master)](https://travis-ci.org/flowchain/flowchain-ledger)
 
 Flowchain-ledger is a distributed ledger technology (DLT) for the Internet of Things (IoT) devices (aka. IoT Blockchain). The Flowchain software framework is designed from the ground up to fit current IoT needs.
+
+This is the **official** Flowchain distributed ledger library, which provides the following APIs:
+* Create data transactions
+* Submit data transactions
 
 # About Flowchain
 
@@ -23,7 +30,7 @@ The FlowchainCoin (symbol: FLC) is the Ethereum ERC20 token for tokenized assets
 * Distributed Hash Table (DHT) by the Chord protocol
 * The device server in Web of Things (WoT) architecture
 
-# How to Use
+# Getting started
 
 Use `flowchain-ledger` to submit transactions.
 
@@ -33,13 +40,12 @@ var node = new PeerNode();;
 node.submit(data);
 ```
 
-The [flowchain-hybrid](https://github.com/flowchain/flowchain-hybrid) is the blockchain application built on flowchain-ledger.
+Please use [flowchain-hybrid](https://github.com/flowchain/flowchain-hybrid) which is the blockchain application built on flowchain-ledger.
 
 ## SDK and Prerequisite
 
 * Node.js v8+
 * [See Flowchain Documentation](https://github.com/flowchain/flowchain-ledger/wiki)
-
 
 # Publication
 
