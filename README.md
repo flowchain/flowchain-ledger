@@ -32,7 +32,13 @@ The FlowchainCoin (symbol: FLC) is the Ethereum ERC20 token for tokenized assets
 
 # Getting started
 
-Use `flowchain-ledger` to submit transactions.
+Install the Flowchain distributed ledger via npm.
+
+```
+npm install flowchain-ledger
+```
+
+Use `flowchain-ledger` to submit a data transaction.
 
 ```
 var PeerNode = require('flowchain-ledger').PeerNode;
