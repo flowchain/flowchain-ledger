@@ -44,7 +44,7 @@ Install the Flowchain distributed ledger via npm.
 npm install flowchain-ledger
 ```
 
-Getting started to use `flowchain-ledger` to submit a data transaction.
+Create the `boot.js` file and use `flowchain-ledger` to submit a data transaction.
 
 ```
 var PeerNode = require('flowchain-ledger').PeerNode;
