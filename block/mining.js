@@ -59,6 +59,12 @@ function Miner() {
     this.startUptime = os.uptime();
 }
 
+/**
+ * Create the merkle root
+ *
+ * @param {Object} txs
+ * @api public
+ */
 Miner.prototype.setTransactions = function(txs) {
     this.txs = txs;
 
@@ -66,6 +72,12 @@ Miner.prototype.setTransactions = function(txs) {
     this.newBlock.merkleRoot = this._tree.level(0)[0];
 };
 
+/**
+ * Create a hash link to the prvious block
+ *
+ * @param {Object} block
+ * @api public
+ */
 Miner.prototype.setPreviousBlock = function(block) {
     this.previousBlock = block;
 
@@ -101,7 +113,12 @@ Miner.prototype.generateHash = function() {
     return this.newBlock.hash;
 };
 
-
+/**
+ * Return true if the new block found
+ *
+ * @return {Boolean}
+ * @api public
+ */
 Miner.prototype.isSuccess = function() {
     return this._success;
 };
